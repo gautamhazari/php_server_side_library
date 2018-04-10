@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="bootstrap.php"
+         colors="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="true">
+    <filter>
+        <blacklist>
+            <directory suffix=".php">../vendor</directory> <!-- exclude vendor code from coverage -->
+        </blacklist>
+    </filter>
+</phpunit>

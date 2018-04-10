@@ -1,0 +1,21 @@
+{
+  "name": "mobile-connect-sdk",
+  "require": {
+    "zendframework/zend-http": "^2.5.1",
+    "zendframework/zend-cache": "^2.7",
+    "phpunit/phpunit-mock-objects": "^3.1",
+    "phpunit/phpunit": "^5.4",
+    "phpunit/php-code-coverage": "^4",
+    "spomky-labs/jose": "^5.2"
+  },
+  "require-dev": {
+
+  },
+  "autoload": {
+    "psr-4": {
+      "MCSDK\\": "src/",
+      "Zend\\": "vendor/zendframework/zend-cache/src/",
+      "JOSE\\": "vendor/spomky-labs/jose/src/"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+<phpunit
+   bootstrap="bootstrap.php"
+   stderr="true">
+    <testsuites>
+        <testsuite name="mobile-connect-sdk">
+            <directory>.</directory>
+        </testsuite>
+    </testsuites>
+    <logging>
+        <log type="coverage-clover"
+             target="../../reports/phpunit.coverage.xml"/>
+        <log type="junit"
+             target="../../reports/phpunit.xml"
+             logIncompleteSkipped="false"/>
+    </logging>
+    <filter>
+      <whitelist processUncoveredFilesFromWhitelist="true">
+        <directory suffix=".php">.</directory>
+      </whitelist>
+    </filter>
+</phpunit>
