@@ -44,11 +44,11 @@ class IdentityResponse {
     public function __construct(RestResponse $rawResponse = null) {
         if (!empty($rawResponse)) {
             $this->_responseCode = (int)$rawResponse->getStatusCode();
-            if ($this->_responseCode < 400) {
+//            if ($this->_responseCode < 400) {
                 $this->_responseJson = $this->extractJson($rawResponse->getContent());
                 $this->parseResponseData($this->_responseJson);
                 return;
-            }
+//            }
         }
 
         if(!empty($rawResponse->getHeaders())&&!empty($rawResponse->getHeaders()->get(Header::WWW_AUTHENTICATE))&&!empty($authenticationError = $rawResponse->getHeaders()->get(Header::WWW_AUTHENTICATE)[0])) {

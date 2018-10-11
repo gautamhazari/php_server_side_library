@@ -36,24 +36,6 @@ use MCSDK\Authentication\AuthenticationOptions;
 class MobileConnectRequestOptions {
     private $_discoveryOptions;
     private $_authOptions;
-    private $_isUsingMobileData;
-    private $_localClientIP;
-    private $_clientIP;
-    private $_display;
-    private $_prompt;
-    private $_uiLocales;
-    private $value;
-    private $_idTokenHint;
-    private $_loginHint;
-    private $_dtbs;
-    private $_scope;
-    private $_acrValues;
-    private $_maxAge;
-    private $_context;
-    private $_bindingMessage;
-    private $_claimsJson;
-    private $_claims;
-    private $_clientName;
 
     public function __construct() {
         $this->_discoveryOptions = new DiscoveryOptions();

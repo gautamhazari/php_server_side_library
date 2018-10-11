@@ -54,8 +54,8 @@ class DefaultOptions
 
     const VERSION_MOBILECONNECT = "mc_v1.1";
     const VERSION_MOBILECONNECTAUTHN = "mc_v1.1";
-    const VERSION_MOBILECONNECTAUTHZ = "mc_v1.2";
-    const VERSION_MOBILECONNECTIDENTITY = "mc_v1.2";
+    const VERSION_MOBILECONNECTAUTHZ = "mc_v1.1";
+    const VERSION_MOBILECONNECTIDENTITY = "mc_v1.1";
     const SDK_VERSION = "PHP-2.2.1";
 }
 

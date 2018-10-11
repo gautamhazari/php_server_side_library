@@ -43,6 +43,7 @@ use MCSDK\Exceptions\MobileConnectEndpointHttpException;
 use MCSDK\Exceptions\OperationCancellationException;
 use MCSDK\Authentication\RevokeTokenResponse;
 use MCSDK\Constants\GrantTypes;
+use PhpParser\Node\Expr\Cast\Object_;
 
 /**
  * Concrete implementation of IAuthenticationService
@@ -93,9 +94,10 @@ class AuthenticationService implements IAuthenticationService {
         $options->setRedirectUrl($redirectUrl);
         $options->setClientId($clientId);
 
-        $version = null;
-        $scope = $this->CoerceAuthenticationScope($options->getScope(), $shouldUseAuthorize, $version, $versions);
-        $options->setScope($scope);
+        $version = $options->getVersion();
+// We set scope in config. Please use it if you need to set it in automode.
+//        $scope = $this->CoerceAuthenticationScope($options->getScope(), $shouldUseAuthorize, $version, $versions);
+//        $options->setScope($scope);
 
         $build = new UriBuilder($authorizeUrl);
         $build->AddQueryParams($this->getAuthenticationQueryParams($options, $shouldUseAuthorize, $version));
@@ -145,43 +147,48 @@ class AuthenticationService implements IAuthenticationService {
     private function shouldUseAuthorize(AuthenticationOptions $options) {
         $authnIndex = stripos($options->getScope(), Scope::AUTHN);
         $authnRequested = ($authnIndex !== false);
-        if(!$authnRequested && !empty($options->getContext()))
+        if(!$authnRequested && !empty($options->getContext())&& $options->getScope()!= Scope::OPENID)
         {
             return true;
         }
         return false;
     }
 
+    private function encodeValue($object) {
+//        return $object !== null? urlencode($object): null;
+        return $object !== null? $object: null;
+    }
+
     public function getAuthenticationQueryParams(AuthenticationOptions $options, $useAuthorize, $version) {
         $authParamters = array(
-            Parameters::AUTHENTICATION_REDIRECT_URI => $options->getRedirectUrl(),
-            Parameters::CLIENT_ID => $options->getClientId(),
-            Parameters::RESPONSE_TYPE => DefaultOptions::AUTHENTICATION_RESPONSE_TYPE,
-            Parameters::SCOPE => $options->getScope(),
-            Parameters::ACR_VALUES => $options->getAcrValues(),
-            Parameters::STATE => $options->getState(),
-            Parameters::NONCE => $options->getNonce(),
-            Parameters::DISPLAY => $options->getDisplay(),
-            Parameters::PROMPT => $options->getPrompt(),
-            Parameters::MAX_AGE => $options->getMaxAge(),
-            Parameters::UI_LOCALES => $options->getUiLocales(),
-            Parameters::CLAIMS_LOCALES => $options->getClaimsLocales(),
-            Parameters::ID_TOKEN_HINT => $options->getIdTokenHint(),
-            Parameters::DTBS => $options->getDtbs(),
-            Parameters::CLAIMS => $this->getClaimsString($options),
-            Parameters::VERSION => $version
+            Parameters::AUTHENTICATION_REDIRECT_URI => $this->encodeValue($options->getRedirectUrl()),
+            Parameters::CLIENT_ID => $this->encodeValue($options->getClientId()),
+            Parameters::RESPONSE_TYPE => $this->encodeValue(DefaultOptions::AUTHENTICATION_RESPONSE_TYPE),
+            Parameters::SCOPE => $this->encodeValue($options->getScope()),
+            Parameters::ACR_VALUES => $this->encodeValue($options->getAcrValues()),
+            Parameters::STATE => $this->encodeValue($options->getState()),
+            Parameters::NONCE => $this->encodeValue($options->getNonce()),
+            Parameters::DISPLAY => $this->encodeValue($options->getDisplay()),
+            Parameters::PROMPT => $this->encodeValue($options->getPrompt()),
+            Parameters::MAX_AGE => $this->encodeValue($options->getMaxAge()),
+            Parameters::UI_LOCALES => $this->encodeValue($options->getUiLocales()),
+            Parameters::CLAIMS_LOCALES => $this->encodeValue( $options->getClaimsLocales()),
+            Parameters::ID_TOKEN_HINT => $this->encodeValue($options->getIdTokenHint()),
+            Parameters::DTBS => $this->encodeValue($options->getDtbs()),
+            Parameters::CLAIMS => $this->encodeValue($this->getClaimsString($options)),
+            Parameters::VERSION => $this->encodeValue($version)
         );
         if ($options->getLoginTokenHint() === null) {
-            $authParamters[Parameters::LOGIN_HINT] = $options->getLoginHint();
+            $authParamters[Parameters::LOGIN_HINT] = $this->encodeValue($options->getLoginHint());
         }
         else{
-            $authParamters[Parameters::LOGIN_TOKEN_HINT] = $options->getLoginTokenHint();
+            $authParamters[Parameters::LOGIN_TOKEN_HINT] = $this->encodeValue($options->getLoginTokenHint());
         }
 
         if ($useAuthorize) {
-            $authParamters[Parameters::CLIENT_NAME] = $options->getClientName();
-            $authParamters[Parameters::CONTEXT] = $options->getContext();
-            $authParamters[Parameters::BINDING_MESSAGE] = $options->getBindingMessage();
+            $authParamters[Parameters::CLIENT_NAME] = $this->encodeValue($options->getClientName());
+            $authParamters[Parameters::CONTEXT] = $this->encodeValue($options->getContext());
+            $authParamters[Parameters::BINDING_MESSAGE] = $this->encodeValue($options->getBindingMessage());
         }
 
         return $authParamters;

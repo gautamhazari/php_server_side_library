@@ -8,12 +8,17 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Input;
+use MCSDK\Authentication\FakeDiscoveryOptions;
+use MCSDK\Discovery\DiscoveryResponse;
+use MCSDK\Discovery\OperatorUrls;
+use MCSDK\MobileConnectInterfaceFactory;
 use MCSDK\MobileConnectWebInterface;
 use MCSDK\MobileConnectRequestOptions;
 use MCSDK\Discovery\DiscoveryService;
 use MCSDK\Discovery\IDiscoveryService;
 use MCSDK\MobileConnectConfig;
 use MCSDK\Utils\MobileConnectResponseType;
+use MCSDK\Utils\RestResponse;
 use MCSDK\Web\ResponseConverter;
 use MCSDK\MobileConnectStatus;
 use MCSDK\Utils\JsonUtils;
@@ -33,11 +38,13 @@ class Controller extends BaseController
     /** @var MobileConnectWebInterface */
     private static $_mobileConnect;
     private static $_operatorUrls;
+    private static $_subId;
     private static $_apiVersion;
     private static $_xRedirect = "APP";
     private static $_includeReqIp;
     private static $_scopes;
     private static $_clientName;
+    private static $json;
 
 
     public function __construct() {
@@ -62,6 +69,7 @@ class Controller extends BaseController
         if(Controller::$_mobileConnect == null) {
             Controller::$_mobileConnect = new MobileConnectWebInterface($discoveryService, $authentication, $identity, $jwks, $config);
         }
+
     }
 
     // Route "start_discovery"
@@ -116,7 +124,7 @@ class Controller extends BaseController
 
 
     // Route "start_authentication"
-    public function StartAuthentication($sdkSession = null, $subscriberId = null, $scope = null, $clientName = null) {
+    public function StartAuthentication($sdkSession, $subscriberId , $scope, $clientName ) {
         if(Controller::$_apiVersion != 'mc_v1.1') {
             $options = new MobileConnectRequestOptions();
             $options->setScope($scope);
@@ -124,13 +132,13 @@ class Controller extends BaseController
             $options->setBindingMessage("demo auth");
             $options->setClientName($clientName);
             $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
-            return $response;
+            return $this->CreateResponse($response);
         }
         else{
             $options = new MobileConnectRequestOptions();
-            $options->setScope($scope);
+            $options->setScope("openid");
             $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
-            return $response;
+            return $this->CreateResponse($response);
         }
     }
 
@@ -175,12 +183,15 @@ class Controller extends BaseController
         return $this->AttemptDiscoveryWrapper($request,null, null, null, null);
     }
 
+    private function CreateResponse(MobileConnectStatus $status)
+    {
+        if ($status->getState() !== null) return $status;
+        else {
+            $json = json_decode(JsonUtils::toJson(ResponseConverter::Convert($status)));
+            $clear_json = (object)array_filter((array)$json);
+            return response()->json($clear_json);
+        }
 
-
-    private function CreateResponse(MobileConnectStatus $status) {
-        $json = json_decode(JsonUtils::toJson(ResponseConverter::Convert($status)));
-        $clear_json = (object) array_filter((array) $json);
-        return response()->json($clear_json);
     }
 
 }

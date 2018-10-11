@@ -25,7 +25,7 @@
 
 namespace MCSDK\Authentication;
 
-include __DIR__ . '/../../vendor/autoload.php';
+//include __DIR__ . '/../../vendor/autoload.php';
 
 use MCSDK\Utils\JsonWebToken;
 use MCSDK\Utils\JWTPart;

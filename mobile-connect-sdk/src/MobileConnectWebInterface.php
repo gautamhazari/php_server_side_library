@@ -291,7 +291,7 @@ class MobileConnectWebInterface
         return $this->RevokeTokenByDiscoveryResponse($token, $tokenTypeHint, $discoveryResponse);
     }
 
-    private function generateUniqueString() {
+    public function generateUniqueString() {
         mt_srand((double)microtime()*10000);
         $charid = strtoupper(md5(uniqid(rand(), true)));
         $hyphen = chr(45);// "-"
@@ -356,6 +356,8 @@ class MobileConnectWebInterface
             $providerMetaData = $this->_discovery->retrieveProviderMetadata($discoveryResponse->getOperatorUrls()->getProviderMetadataUrl());
             $discoveryResponse->setProviderMetadata($providerMetaData);
         }
-        return $this->cacheIfRequired(MobileConnectInterfaceHelper::generateStatusFromDiscoveryResponse($this->_discovery, $discoveryResponse));
+// Use it if you need to retrieve discoveryResponse via API
+//        return $this->cacheIfRequired(MobileConnectInterfaceHelper::generateStatusFromDiscoveryResponse($this->_discovery, $discoveryResponse));
+        return $discoveryResponse;
     }
 }
