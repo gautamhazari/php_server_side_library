@@ -53,7 +53,7 @@ Here are 10 parameters:
 }
 ```
 Installation is finished.
-You can open the configuration file .env at the root of the project and set correct values for variables DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME and DB_PASSWORD. 
+You can open the configuration file <code class="java-lang">.env</code> at the root of the project and set correct values for variables DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME and DB_PASSWORD. 
 After changing configuration files you have to restart the docker container:
 ```posh
 sudo docker run -p 80:80 -it -v /home/serverside/:/opt/lampp/htdocs/ cswl/xampp bash
