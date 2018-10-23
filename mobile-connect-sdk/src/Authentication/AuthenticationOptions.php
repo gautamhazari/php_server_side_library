@@ -29,6 +29,7 @@ use MCSDK\Constants\DefaultOptions;
 class AuthenticationOptions
 {
     private $_clientId;
+    private $_version;
     private $_redirectUrl;
     private $_acrValues;
     private $_scope;
@@ -63,6 +64,14 @@ class AuthenticationOptions
 
     public function setClientId($clientId) {
         $this->_clientId = $clientId;
+    }
+
+    public function getVersion() {
+        return $this->_version;
+    }
+
+    public function setVersion($version) {
+        $this->_version = $version;
     }
 
     public function getRedirectUrl() {

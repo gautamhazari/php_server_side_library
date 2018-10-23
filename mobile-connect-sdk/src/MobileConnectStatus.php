@@ -136,6 +136,9 @@ class MobileConnectStatus
      * @return MobileConnectStatus with ResponseType UserInfo
      */
     public static function UserInfo(IdentityResponse $response) {
+        if (!empty($response->getErrorResponse())) {
+            return static::Error($response->getErrorResponse()['error'],$response->getErrorResponse()['error-description'] );
+        }
         $mobileConnectStatus = new MobileConnectStatus();
         $mobileConnectStatus->setResponseType(MobileConnectResponseType::UserInfo);
         $mobileConnectStatus->setIdentityResponse($response);
@@ -149,6 +152,9 @@ class MobileConnectStatus
      * @return MobileConnectStatus with ResponseType Identity
      */
     public static function Identity(IdentityResponse $response) {
+        if (!empty($response->getErrorResponse())) {
+            return static::Error($response->getErrorResponse()['error'],$response->getErrorResponse()['error-description'] );
+        }
         $mobileConnectStatus = new MobileConnectStatus();
         $mobileConnectStatus->setResponseType(MobileConnectResponseType::Identity);
         $mobileConnectStatus->setIdentityResponse($response);
@@ -159,7 +165,7 @@ class MobileConnectStatus
     public static function TokenRevoked(RevokeTokenResponse $response) {
 
         if (!empty($response->getErrorResponse())) {
-            return static::Error($response->getErrorResponse());
+            return static::Error($response->getErrorResponse()['error'],$response->getErrorResponse()['error-description'] );
         }
         $mobileConnectStatus = new MobileConnectStatus();
         $mobileConnectStatus->setResponseType(MobileConnectResponseType::TokenRevoked);
