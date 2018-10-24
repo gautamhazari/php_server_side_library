@@ -18,11 +18,6 @@ Download the Mobile Connect server side project.
 git init
 git pull https://github.com/Mobile-Connect/php_server_side_library.git
 ```
-Go to <code class="java-lang">/home/serverside/php-server-side-library</code> folder and then run next commands:
-```posh
-curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-composer install
-```
 Run docker image:
 ```posh
 sudo docker run -p 80:80 -it -v /home/serverside/:/opt/lampp/htdocs/ cswl/xampp bash
@@ -30,12 +25,15 @@ sudo docker run -p 80:80 -it -v /home/serverside/:/opt/lampp/htdocs/ cswl/xampp 
 In Docker container run next commands:
 ```posh
 cd /opt/lampp/htdocs/php-server-side-library
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+composer install
 mv .env.example .env
 php artisan key:generate
-chmod -R 777 /home/serverside/php-server-side-library/
-chmod -R 777 /home/serverside/mobile-connect-sdk/
+chmod -R 777 /opt/lampp/htdocs/php-server-side-library/
+chmod -R 777 /opt/lampp/htdocs/mobile-connect-sdk/
 mysql</opt/lampp/htdocs/init_db.sql 
 ```
+Note: please use your actual path to PHP server side library in Docker image instead of /opt/lampp/htdocs/ if it is different.
 Open the configuration file and change it: \php-server-side-library\app\data\data.json.
 Here are 10 parameters:
 ```posh
