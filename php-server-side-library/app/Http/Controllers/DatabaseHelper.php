@@ -31,6 +31,10 @@ class DatabaseHelper
         DB::connection("mysql")->table('discovery_cache')->where('value', '=', $rawDiscoveryResponse)->delete();
     }
 
+    public function clearDiscoveryCacheByState($state){
+        DB::connection("mysql")->table('discovery')->where('id', '=', $state)->delete();
+    }
+
     public function setCachedDiscoveryResponseByMsisdn($msisdn, $discoveryResponse){
         $date = $discoveryResponse->getTtl()->format("c");
         $rawDiscoveryResponse = (new FakeDiscoveryOptions())->fromDiscoveryResponse($discoveryResponse)->getJson();

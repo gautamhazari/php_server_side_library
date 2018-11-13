@@ -162,9 +162,11 @@ class MobileConnectInterfaceHelper {
         }
 
         $operatorSelectionUrl = $discovery->extractOperatorSelectionUrl($response);
+//----------------------
         if (!empty($operatorSelectionUrl)) {
             return static::operatorSelection($operatorSelectionUrl);
         }
+        //--------------------
         return MobileConnectStatus::StartAuthorization($response);
     }
 

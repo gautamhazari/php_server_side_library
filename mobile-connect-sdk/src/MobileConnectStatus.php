@@ -258,7 +258,7 @@ class MobileConnectStatus
 
     public static function Error($error, $message, $ex = null) {
         $status = new MobileConnectStatus();
-        $status->setErrorCode(empty($error) ? INTERNAL_ERROR_CODE : $error);
+        $status->setErrorCode($error);
         $status->setErrorMessage($message);
         $status->setException($ex);
         $status->setResponseType(MobileConnectResponseType::Error);

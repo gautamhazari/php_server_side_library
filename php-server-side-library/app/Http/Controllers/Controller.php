@@ -12,6 +12,7 @@ use MCSDK\Authentication\FakeDiscoveryOptions;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\OperatorUrls;
 use MCSDK\MobileConnectInterfaceFactory;
+use MCSDK\MobileConnectInterfaceHelper;
 use MCSDK\MobileConnectWebInterface;
 use MCSDK\MobileConnectRequestOptions;
 use MCSDK\Discovery\DiscoveryService;
@@ -40,7 +41,7 @@ class Controller extends BaseController
     private static $_operatorUrls;
     private static $_subId;
     private static $_apiVersion;
-    private static $_xRedirect = "APP";
+//    private static $_xRedirect = "APP";
     private static $_includeReqIp;
     private static $_scopes;
     private static $_clientName;
@@ -62,7 +63,8 @@ class Controller extends BaseController
         $config->setClientSecret($json["clientSecret"]);
         $config->setDiscoveryUrl($json["discoveryURL"]);
         $config->setRedirectUrl($json["redirectURL"]);
-        Controller::$_xRedirect = $json["xRedirect"];
+//        Controller::$_xRedirect = $json["xRedirect"];
+        Controller::$_includeReqIp = $json["includeRequestIP"];
         Controller::$_apiVersion = $json["apiVersion"];
         Controller::$_clientName = $json["clientName"];
         Controller::$_scopes = $json["scopes"];
@@ -77,34 +79,43 @@ class Controller extends BaseController
         $msisdn = Input::get("msisdn");
         $mcc = Input::get("mcc");
         $mnc = Input::get("mnc");
-        $sourceIp = $request->header("X-Source-IP");
-        return $this->AttemptDiscoveryWrapper($request, $msisdn, $mcc, $mnc, $sourceIp);
+        $sourceIp = Input::get("sourceIp");
+
+        return $this->AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request);
     }
 
-    private function AttemptDiscoveryWrapper($request, $msisdn, $mcc, $mnc, $sourceIp){
+    private function AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request){
         $databaseHelper = new DatabaseHelper();
         $options = new MobileConnectRequestOptions();
-        if($sourceIp!=""){
-            $options->setClientIp($sourceIp);
-        }
-        $options->getDiscoveryOptions()->setXRedirect(Controller::$_xRedirect);
+        $options->setClientIp($sourceIp);
+// Ask about it ???
+//        $options->getDiscoveryOptions()->setXRedirect(Controller::$_xRedirect);
         $response = Controller::$_mobileConnect->AttemptDiscovery($request, $msisdn, $mcc, $mnc, Controller::$_includeReqIp, true, $options);
-        if(empty($response->getDiscoveryResponse())){
-            $response = Controller::$_mobileConnect->AttemptDiscovery($request, null, null, null, Controller::$_includeReqIp, true, $options);
-        }
-        if($response->getResponseType() == MobileConnectResponseType::StartAuthentication) {
-            if(empty($mcc)&&empty($mnc)) {
-                $this->setCacheByRequest($mcc, $mnc, $sourceIp, $msisdn, $response->getDiscoveryResponse());
+
+        if($response->getDiscoveryResponse() == null || ($_SERVER['REDIRECT_STATUS'] != 200 )) {
+            if (!empty($response->getUrl())) {
+                return redirect($response->getUrl());
+            } else {
+                $response = Controller::$_mobileConnect->AttemptDiscovery($request, null, null, null, Controller::$_includeReqIp, false, $options);
+                if (!empty($response->getUrl())) {
+                    return redirect($response->getUrl());
+                }
             }
+
+        }
+
+        if($response->getResponseType() == MobileConnectResponseType::StartAuthentication) {
+            $this->setCacheByRequest($mcc, $mnc, $sourceIp, $msisdn, $response->getDiscoveryResponse());
+
             $authResponse = $this->StartAuthentication($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()['subscriber_id'],
                 Controller::$_scopes, Controller::$_clientName);
             $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $response->getDiscoveryResponse());
             $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
             return redirect($authResponse->getUrl());
+
         }
-        if($response->getResponseType() == MobileConnectResponseType::OperatorSelection)
-            return redirect($response->getUrl());
-        return $this->CreateResponse($response);
+
+        return WdController::CreateResponse($response);
     }
 
     private function setCacheByRequest($mcc, $mnc, $ip, $msisdn, $discoveryResponse){
@@ -114,7 +125,7 @@ class Controller extends BaseController
                 $databaseHelper->setCachedDiscoveryResponseByMsisdn($msisdn, $discoveryResponse);
             }
             if (!empty($mcc) && !empty($mnc)) {
-                $databaseHelper->setCachedDiscoveryResponseByMccMnc($msisdn, $mcc, $mnc, $discoveryResponse);
+                $databaseHelper->setCachedDiscoveryResponseByMccMnc($mcc, $mnc, $discoveryResponse);
             }
             if (!empty($ip)) {
                 $databaseHelper->setCachedDiscoveryResponseByIp($ip, $discoveryResponse);
@@ -132,26 +143,26 @@ class Controller extends BaseController
             $options->setBindingMessage("demo auth");
             $options->setClientName($clientName);
             $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
-            return $this->CreateResponse($response);
+            return WdController::CreateResponse($response);
         }
         else{
             $options = new MobileConnectRequestOptions();
             $options->setScope("openid");
             $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
-            return $this->CreateResponse($response);
+            return WdController::CreateResponse($response);
         }
     }
 
     // Route "user_info"
     public function RequestUserInfo($sdkSession = null, $accessToken = null) {
         $response = Controller::$_mobileConnect->RequestUserInfo($sdkSession, $accessToken, new MobileConnectRequestOptions());
-        return $this->CreateResponse($response);
+        return WdController::CreateResponse($response);
     }
 
     // Route "identity"
     public function RequestIdentity($sdkSession = null, $accessToken = null) {
         $response =  Controller::$_mobileConnect->RequestIdentity($sdkSession, $accessToken, new MobileConnectRequestOptions());
-        return $this->CreateResponse($response);
+        return WdController::CreateResponse($response);
     }
 
     // Route ""
@@ -165,33 +176,24 @@ class Controller extends BaseController
             $discoveryResponse = $databaseHelper->getDiscoveryResponseFromDatabase($state);
             $nonce = $databaseHelper->getNonceFromDatabase($state);
             $response = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, $discoveryResponse, $state, $nonce, new MobileConnectRequestOptions());
-            return $this->CreateResponse($response);
-        }
-        if(!empty($mcc_mnc)){
+            return WdController::CreateResponse($response);
+        } elseif (!empty($mcc_mnc)){
             $response = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, null, $state, null, new MobileConnectRequestOptions());
             $data = explode("_",$mcc_mnc);
             $mcc = $data[0];
             $mnc = $data[1];
-            $this->setCacheByRequest($mcc, $mnc, null, null, $response->getDiscoveryResponse());
             $authResponse = $this->StartAuthentication($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()['subscriber_id'],
                 Controller::$_scopes, Controller::$_clientName);
             $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $response->getDiscoveryResponse());
             $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
             return redirect($authResponse->getUrl());
         }
-        $databaseHelper->clearDiscoveryCache($databaseHelper->getDiscoveryResponseFromDatabase($state));
-        return $this->AttemptDiscoveryWrapper($request,null, null, null, null);
-    }
+        else{
+            $errorCode = Input::get("error");
+            $errorDesc = Input::get("error_description");
+            $databaseHelper->clearDiscoveryCacheByState($state);
+            return WdController::CreateResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
 
-    private function CreateResponse(MobileConnectStatus $status)
-    {
-        if ($status->getState() !== null) return $status;
-        else {
-            $json = json_decode(JsonUtils::toJson(ResponseConverter::Convert($status)));
-            $clear_json = (object)array_filter((array)$json);
-            return response()->json($clear_json);
         }
-
     }
-
 }

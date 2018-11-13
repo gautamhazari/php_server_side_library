@@ -10,6 +10,6 @@
 	"authURL": "https://operator-b.sandbox.mobileconnect.io/oidc/authorize",
 	"tokenURL": "https://operator-b.sandbox.mobileconnect.io/oidc/accesstoken",
 	"userInfoURl": "https://operator-b.sandbox.mobileconnect.io/oidc/userinfo",
-	"premiumInfoURl": "https://operator-b.sandbox.mobileconnect.io/oidc/userinfo",
+	"premiumInfoURl": "https://operator-b.sandbox.mobileconnect.io/oidc/premiuminfo",
 	"metadataURl": ""
 }

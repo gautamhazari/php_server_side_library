@@ -77,7 +77,7 @@ class MobileConnectWebInterface
     public function AttemptDiscovery($request, $msisdn, $mcc, $mnc, $includeReqIp, $shouldProxyCookies,
         MobileConnectRequestOptions $options) {
 
-        $clientIp = empty($options->getClientIp()) && $includeReqIp? $request->ip_address() : $options->getClientIp();
+        $clientIp = empty($options->getClientIp()) && $includeReqIp? $request->header("X-Forwarded-For") : $options->getClientIp();
         $options->setClientIp($clientIp);
         $cookies = $shouldProxyCookies ? $request->cookie() : null;
         $response = MobileConnectInterfaceHelper::AttemptDiscovery($this->_discovery, $msisdn, $mcc, $mnc, $this->_config, $options, $cookies);

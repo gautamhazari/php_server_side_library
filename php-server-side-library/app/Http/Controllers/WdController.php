@@ -136,7 +136,7 @@ class WdController extends BaseController
         return $this->CreateResponse($response);
     }
 
-    private function CreateResponse(MobileConnectStatus $status)
+    public static function CreateResponse(MobileConnectStatus $status)
     {
         if ($status->getState() !== null) return $status;
         else {

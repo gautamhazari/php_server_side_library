@@ -64,7 +64,6 @@ class RestClient {
 
         $this->createRequest($auth, Request::METHOD_GET, $builder->getUri(), $sourceIp, $xRedirect, $cookies);
         $response = $this->_client->send();
-
         return $this->createRestResponse($response);
     }
 
