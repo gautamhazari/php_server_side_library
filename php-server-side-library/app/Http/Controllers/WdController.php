@@ -2,34 +2,21 @@
 
 namespace App\Http\Controllers;
 require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
+
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Input;
-use MCSDK\Authentication\FakeDiscoveryOptions;
-use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\OperatorUrls;
-use MCSDK\MobileConnectInterfaceFactory;
-use MCSDK\MobileConnectInterfaceHelper;
-use MCSDK\MobileConnectWebInterface;
-use MCSDK\MobileConnectRequestOptions;
-use MCSDK\Discovery\DiscoveryService;
-use MCSDK\Discovery\IDiscoveryService;
 use MCSDK\MobileConnectConfig;
-use MCSDK\Utils\MobileConnectResponseType;
-use MCSDK\Utils\RestResponse;
-use MCSDK\Web\ResponseConverter;
+use MCSDK\MobileConnectInterfaceFactory;
+use MCSDK\MobileConnectRequestOptions;
 use MCSDK\MobileConnectStatus;
+use MCSDK\MobileConnectWebInterface;
 use MCSDK\Utils\JsonUtils;
-use MCSDK\Authentication\AuthenticationService;
-use MCSDK\Identity\IIdentityService;
-use MCSDK\Identity\IdentityService;
-use MCSDK\Cache\Cache;
-use MCSDK\Utils\RestClient;
-use MCSDK\Authentication\JWKeysetService;
-use Symfony\Component\VarDumper\Cloner\Data;
+use MCSDK\Web\ResponseConverter;
 
 
 class WdController extends BaseController
@@ -86,17 +73,20 @@ class WdController extends BaseController
 
     // Route "start_authentication_wd" and "start_authorization_wd"
     public function StartAuthenticationWithoutDiscovery(Request $request) {
-        $subscriberId = Input::get("subscriberId");
-
+        $msisdn = Input::get("msisdn");
+        if (!empty($msisdn)) {
+            $loginHint = sprintf("%s:%s", "MSISDN", $msisdn);
+            WdController::$_options->setLoginHint($loginHint);
+        }
         $discoveryResponse = WdController::$_mobileConnect->makeDiscoveryWithoutCall(WdController::$_config->getClientId(), WdController::$_config->getClientSecret(),
-            WdController::$_operatorUrls, WdController::$_options->getClientName(), $subscriberId);
+            WdController::$_operatorUrls, WdController::$_options->getClientName());
 
         $state = WdController::$_mobileConnect->generateUniqueString();
         $nonce = WdController::$_mobileConnect->generateUniqueString();
         WdController::$_databaseHelper->writeDiscoveryResponseToDatabase($state, $discoveryResponse);
         WdController::$_databaseHelper->writeNonceToDatabase($state, $nonce);
 
-        $response = WdController::$_mobileConnect->Authentication($discoveryResponse, $subscriberId, $state, $nonce, WdController::$_options);
+        $response = WdController::$_mobileConnect->Authentication($discoveryResponse, null, $state, $nonce, WdController::$_options);
         return redirect($response->getUrl());
     }
 

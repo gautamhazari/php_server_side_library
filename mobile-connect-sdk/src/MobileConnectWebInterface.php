@@ -25,13 +25,13 @@
 
 namespace MCSDK;
 use MCSDK\Authentication\FakeDiscoveryOptions;
+use MCSDK\Authentication\IAuthenticationService;
+use MCSDK\Authentication\IJWKeysetService;
+use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\IDiscoveryService;
 use MCSDK\Discovery\OperatorUrls;
-use MCSDK\Discovery\DiscoveryResponse;
-use MCSDK\Authentication\IAuthenticationService;
 use MCSDK\Identity\IIdentityService;
 use MCSDK\Utils\MobileConnectResponseType;
-use MCSDK\Authentication\IJWKeysetService;
 use MCSDK\Utils\RestResponse;
 
 /**
@@ -339,14 +339,13 @@ class MobileConnectWebInterface
      * @param OperatorUrls $_operatorUrls
      * @return MobileConnectStatus
      */
-    public function makeDiscoveryWithoutCall($clientId, $clientSecret, $_operatorUrls, $clientName="Client Name", $subId=NULL){
+    public function makeDiscoveryWithoutCall($clientId, $clientSecret, $_operatorUrls, $clientName="Client Name"){
 
         $discoveryOptions = new FakeDiscoveryOptions();
         $discoveryOptions->setClientId($clientId);
         $discoveryOptions->setClientSecret($clientSecret);
         $discoveryOptions->setClientName($clientName);
         $discoveryOptions->setOperatorUrls($_operatorUrls);
-        $discoveryOptions->setSubId($subId);
 
         $json = $discoveryOptions->getJson();
 
