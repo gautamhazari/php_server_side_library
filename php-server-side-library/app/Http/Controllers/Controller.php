@@ -2,34 +2,25 @@
 
 namespace App\Http\Controllers;
 require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
+
+use App\Http\Config\Config;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Input;
-use MCSDK\Authentication\FakeDiscoveryOptions;
-use MCSDK\Discovery\DiscoveryResponse;
-use MCSDK\Discovery\OperatorUrls;
-use MCSDK\MobileConnectInterfaceFactory;
-use MCSDK\MobileConnectInterfaceHelper;
-use MCSDK\MobileConnectWebInterface;
-use MCSDK\MobileConnectRequestOptions;
-use MCSDK\Discovery\DiscoveryService;
-use MCSDK\Discovery\IDiscoveryService;
-use MCSDK\MobileConnectConfig;
-use MCSDK\Utils\MobileConnectResponseType;
-use MCSDK\Utils\RestResponse;
-use MCSDK\Web\ResponseConverter;
-use MCSDK\MobileConnectStatus;
-use MCSDK\Utils\JsonUtils;
 use MCSDK\Authentication\AuthenticationService;
-use MCSDK\Identity\IIdentityService;
-use MCSDK\Identity\IdentityService;
-use MCSDK\Cache\Cache;
-use MCSDK\Utils\RestClient;
 use MCSDK\Authentication\JWKeysetService;
-use Symfony\Component\VarDumper\Cloner\Data;
+use MCSDK\Cache\Cache;
+use MCSDK\Discovery\DiscoveryResponse;
+use MCSDK\Discovery\DiscoveryService;
+use MCSDK\Identity\IdentityService;
+use MCSDK\MobileConnectRequestOptions;
+use MCSDK\MobileConnectStatus;
+use MCSDK\MobileConnectWebInterface;
+use MCSDK\Utils\MobileConnectResponseType;
+use MCSDK\Utils\RestClient;
 
 
 class Controller extends BaseController
@@ -46,33 +37,32 @@ class Controller extends BaseController
     private static $_scopes;
     private static $_clientName;
     private static $json;
+    private static $_config;
 
-
-    public function __construct() {
+    public function __construct()
+    {
         $cache = new Cache();
+
+        if (Controller::$_config == null) {
+            Controller::$_config = new Config();
+        }
 
         $discoveryService = new DiscoveryService(new RestClient(), $cache);
         $authentication = new AuthenticationService();
         $identity = new IdentityService(new RestClient());
         $jwks = new JWKeysetService(new RestClient(), $discoveryService->getCache());
-        $config = new MobileConnectConfig();
-        $string = file_get_contents(dirname(dirname(dirname(__FILE__))).DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."data.json");
-        $json = json_decode($string, true);
 
-        $config->setClientId($json["clientID"]);
-        $config->setClientSecret($json["clientSecret"]);
-        $config->setDiscoveryUrl($json["discoveryURL"]);
-        $config->setRedirectUrl($json["redirectURL"]);
 //        Controller::$_xRedirect = $json["xRedirect"];
-        Controller::$_includeReqIp = $json["includeRequestIP"];
-        Controller::$_apiVersion = $json["apiVersion"];
-        Controller::$_clientName = $json["clientName"];
-        Controller::$_scopes = $json["scopes"];
-        if(Controller::$_mobileConnect == null) {
-            Controller::$_mobileConnect = new MobileConnectWebInterface($discoveryService, $authentication, $identity, $jwks, $config);
+        Controller::$_includeReqIp = Controller::$_config->isIncludeRequestIP();
+        Controller::$_apiVersion = Controller::$_config->getApiVersion();
+        Controller::$_clientName = Controller::$_config->getClientName();
+        Controller::$_scopes = Controller::$_config->getScopes();
+        if (Controller::$_mobileConnect == null) {
+            Controller::$_mobileConnect = new MobileConnectWebInterface($discoveryService, $authentication, $identity, $jwks, Controller::$_config->getMcConfig());
         }
-
     }
+
+
 
     // Route "start_discovery"
     public function StartDiscovery(Request $request) {
