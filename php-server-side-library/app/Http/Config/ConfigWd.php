@@ -11,132 +11,119 @@ namespace App\Http\Config;
 use App\Http\Constants;
 use MCSDK\Discovery\OperatorUrls;
 use MCSDK\MobileConnectConfig;
-use MCSDK\MobileConnectRequestOptions;
 
 class ConfigWd
 {
-    private static $client_id;
-    private static $clientSecret;
-    private static $redirectURL;
-    private static $apiVersion;
-    private static $clientName;
-    private static $scopes;
+    private $client_id;
+    private $clientSecret;
+    private $redirectURL;
+    private $apiVersion;
+    private $clientName;
+    private $scopes;
 
-    private static $context;
-    private static $binding_message;
-    private static $authURL;
-    private static $tokenURL;
-    private static $userInfoURl;
-    private static $premiumInfoURl;
-    private static $metadataURl;
+    private $context;
+    private $binding_message;
+    private $authURL;
+    private $tokenURL;
+    private $userInfoURl;
+    private $premiumInfoURl;
+    private $metadataURl;
 
-    private static $_operatorUrls;
-    private static $_config;
-    private static $_options;
+    private $_operatorUrls;
+    private $_config;
+    private $_options;
 
     public function __construct() {
         $string = file_get_contents(dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "withoutDiscoveryData.json");
         $json = json_decode($string, true);
-        ConfigWd::$client_id = $json[Constants::CLIENT_ID];
-        ConfigWd::$clientSecret = $json[Constants::CLIENT_SECRET];
-        ConfigWd::$redirectURL = $json[Constants::REDIRECT_URL];
-        ConfigWd::$apiVersion = $json[Constants::API_VERS];
-        ConfigWd::$clientName = $json[Constants::CLIENT_NAME];
-        ConfigWd::$scopes = $json[Constants::SCOPES];
+        $this->client_id = $json[Constants::CLIENT_ID];
+        $this->clientSecret = $json[Constants::CLIENT_SECRET];
+        $this->redirectURL = $json[Constants::REDIRECT_URL];
+        $this->apiVersion = $json[Constants::API_VERS];
+        $this->clientName = $json[Constants::CLIENT_NAME];
+        $this->scopes = $json[Constants::SCOPES];
 
-        ConfigWd::$context = $json[Constants::CONTEXT];
-        ConfigWd::$binding_message = $json[Constants::BIND_MSG];
-        ConfigWd::$authURL = $json[Constants::AUTH_URL];
-        ConfigWd::$tokenURL = $json[Constants::TOKEN_URL];
-        ConfigWd::$userInfoURl = $json[Constants::USERINFO_URL];
-        ConfigWd::$premiumInfoURl = $json[Constants::PREMIUMINFO_URL];
-        ConfigWd::$metadataURl = $json[Constants::METADATA_URL];
+        $this->context = $json[Constants::CONTEXT];
+        $this->binding_message = $json[Constants::BIND_MSG];
+        $this->authURL = $json[Constants::AUTH_URL];
+        $this->tokenURL = $json[Constants::TOKEN_URL];
+        $this->userInfoURl = $json[Constants::USERINFO_URL];
+        $this->premiumInfoURl = $json[Constants::PREMIUMINFO_URL];
+        $this->metadataURl = $json[Constants::METADATA_URL];
     }
 
     public function getMcConfig() {
-        if (ConfigWd::$_config == null) {
-            ConfigWd::$_config = new MobileConnectConfig();
-            ConfigWd::$_config->setClientId(ConfigWd::$client_id);
-            ConfigWd::$_config->setClientSecret(ConfigWd::$clientSecret);
-            ConfigWd::$_config->setRedirectUrl(ConfigWd::$redirectURL);
+        if ($this->_config == null) {
+            $this->_config = new MobileConnectConfig();
+            $this->_config->setClientId($this->client_id);
+            $this->_config->setClientSecret($this->clientSecret);
+            $this->_config->setRedirectUrl($this->redirectURL);
         }
-        return ConfigWd::$_config;
+        return $this->_config;
     }
 
     public function getOperatorUrls() {
-        if (ConfigWd::$_operatorUrls == null) {
-            ConfigWd::$_operatorUrls = new OperatorUrls();
-            ConfigWd::$_operatorUrls->setAuthorizationUrl(ConfigWd::$authURL);
-            ConfigWd::$_operatorUrls->setRequestTokenUrl(ConfigWd::$tokenURL);
-            ConfigWd::$_operatorUrls->setUserInfoUrl(ConfigWd::$userInfoURl);
-            ConfigWd::$_operatorUrls->setPremiumInfoUrl(ConfigWd::$premiumInfoURl);
-            ConfigWd::$_operatorUrls->setProviderMetadataUrl(ConfigWd::$metadataURl);
+        if ($this->_operatorUrls == null) {
+            $this->_operatorUrls = new OperatorUrls();
+            $this->_operatorUrls->setAuthorizationUrl($this->authURL);
+            $this->_operatorUrls->setRequestTokenUrl($this->tokenURL);
+            $this->_operatorUrls->setUserInfoUrl($this->userInfoURl);
+            $this->_operatorUrls->setPremiumInfoUrl($this->premiumInfoURl);
+            $this->_operatorUrls->setProviderMetadataUrl($this->metadataURl);
         }
-        return ConfigWd::$_operatorUrls;
-    }
-
-    public function getMcOptions() {
-        if (ConfigWd::$_options == null) {
-            ConfigWd::$_options = new MobileConnectRequestOptions();
-            ConfigWd::$_options->getAuthenticationOptions()->setVersion(ConfigWd::$apiVersion);
-            ConfigWd::$_options->setScope(ConfigWd::$scopes);
-            ConfigWd::$_options->setContext(ConfigWd::$context);
-            ConfigWd::$_options->setBindingMessage(ConfigWd::$binding_message);
-            ConfigWd::$_options->setClientName(ConfigWd::$clientName);
-        }
-        return ConfigWd::$_options;
+        return $this->_operatorUrls;
     }
 
     public function getClientId() {
-        return ConfigWd::$client_id;
+        return $this->client_id;
     }
 
     public function getClientSecret() {
-        return ConfigWd::$clientSecret;
+        return $this->clientSecret;
     }
 
     public function getRedirectUrl() {
-        return ConfigWd::$redirectURL;
+        return $this->redirectURL;
     }
 
     public function getApiVersion() {
-        return ConfigWd::$apiVersion;
+        return $this->apiVersion;
     }
 
     public function getClientName() {
-        return ConfigWd::$clientName;
+        return $this->clientName;
     }
 
     public function getScopes() {
-        return ConfigWd::$scopes;
+        return $this->scopes;
     }
 
     public function getContext() {
-        return ConfigWd::$context;
+        return $this->context;
     }
 
     public function getBindingMessage() {
-        return ConfigWd::$binding_message;
+        return $this->binding_message;
     }
 
     public function getAuthURL() {
-        return ConfigWd::$authURL;
+        return $this->authURL;
     }
 
     public function getTokenUrl() {
-        return ConfigWd::$tokenURL;
+        return $this->tokenURL;
     }
 
     public function getUserInfoURl() {
-        return ConfigWd::$userInfoURl;
+        return $this->userInfoURl;
     }
 
     public function getPremiumInfoURl() {
-        return ConfigWd::$premiumInfoURl;
+        return $this->premiumInfoURl;
     }
 
     public function getMetadataURl() {
-        return ConfigWd::$metadataURl;
+        return $this->metadataURl;
     }
 
 }

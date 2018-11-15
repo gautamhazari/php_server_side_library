@@ -8,5 +8,7 @@
 	"includeRequestIP": "True",
 	"scopes":"openid",
 	"apiVersion":"mc_di_r2_v2.3",
-	"clientName":"PhpServerSideDemo"
+	"clientName":"PhpServerSideDemo",
+	"context":"demo",
+	"binding_message":"demo auth"
 }

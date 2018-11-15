@@ -11,6 +11,11 @@ namespace App\Http;
 class Constants
 {
     public const MSISDN = "msisdn";
+    public const MCC = "mcc";
+    public const MNC = "mnc";
+    public const SOURCE_IP = "sourceIp";
+
+
     public const ERROR = "error";
     public const ERROR_DESCR = "error_description";
 
@@ -34,5 +39,10 @@ class Constants
     public const USERINFO_URL = "userInfoURl";
     public const PREMIUMINFO_URL = "premiumInfoURl";
     public const METADATA_URL = "metadataURl";
+
+    public const VERSION_1_1 = "mc_v1.1";
+    public const VERSION_2_0 = "mc_v2.0";
+    public const VERSION_DI_2_3 = "mc_di_r2_v2.3";
+    public const VERSION_SI_1_0 = "mc_si_r2_v1.0";
 }
 

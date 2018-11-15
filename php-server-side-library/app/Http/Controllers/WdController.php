@@ -28,6 +28,11 @@ class WdController extends BaseController
     private static $_mobileConnect;
     private static $_databaseHelper;
     private static $_config;
+    private static $_apiVersion;
+    private static $_scopes;
+    private static $_clientName;
+    private static $_context;
+    private static $_bindingMessage;
 
     public function __construct()
     {
@@ -42,15 +47,29 @@ class WdController extends BaseController
         if (WdController::$_mobileConnect == null) {
             WdController::$_mobileConnect = MobileConnectInterfaceFactory::buildMobileConnectWebInterfaceWithConfig(WdController::$_config->getMcConfig());
         }
+        WdController::$_apiVersion = WdController::$_config->getApiVersion();
+        WdController::$_scopes = WdController::$_config->getScopes();
+        WdController::$_clientName = WdController::$_config->getClientName();
+        WdController::$_context = WdController::$_config->getContext();
+        WdController::$_bindingMessage = WdController::$_config->getBindingMessage();
+
     }
 
+    // Route "start_authentication_wd"
+    public function StartAuthentication(Request $request) {
+        return $this->StartAuth($request);
+    }
 
-    // Route "start_authentication_wd" and "start_authorization_wd"
-    public function StartAuthenticationWithoutDiscovery(Request $request) {
+    // Route "start_authorization_wd"
+    public function StartAuthorisation(Request $request) {
+        return $this->StartAuth($request);
+    }
+
+    private function StartAuth(Request $request) {
         $msisdn = Input::get(Constants::MSISDN);
         if (!empty($msisdn)) {
             $loginHint = sprintf("%s:%s", strtoupper (Constants::MSISDN), $msisdn);
-            $_options = WdController::$_config->getMcOptions();
+            $_options = WdController::getMcOptions();
             $_options->setLoginHint($loginHint);
         }
         $discoveryResponse = WdController::$_mobileConnect->makeDiscoveryWithoutCall(WdController::$_config->getClientId(), WdController::$_config->getClientSecret(),
@@ -101,8 +120,7 @@ class WdController extends BaseController
         return $this->CreateResponse($response);
     }
 
-    public static function CreateResponse(MobileConnectStatus $status)
-    {
+    public static function CreateResponse(MobileConnectStatus $status)    {
         if ($status->getState() !== null) return $status;
         else {
             $json = json_decode(JsonUtils::toJson(ResponseConverter::Convert($status)));
@@ -110,6 +128,16 @@ class WdController extends BaseController
             return response()->json($clear_json);
         }
 
+    }
+
+    private static function getMcOptions() {
+            $_options = new MobileConnectRequestOptions();
+            $_options->getAuthenticationOptions()->setVersion(WdController::$_apiVersion);
+            $_options->setScope(WdController::$_scopes);
+            $_options->setContext((WdController::$_apiVersion == Constants::VERSION_2_0 || WdController::$_apiVersion == Constants::VERSION_DI_2_3) ? WdController::$_context : null);
+            $_options->setBindingMessage((WdController::$_apiVersion == Constants::VERSION_2_0 || WdController::$_apiVersion == Constants::VERSION_DI_2_3) ? WdController::$_bindingMessage : null);
+            $_options->setClientName(WdController::$_clientName);
+        return $_options;
     }
 
 }

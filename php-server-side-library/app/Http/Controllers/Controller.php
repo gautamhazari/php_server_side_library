@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
 
 use App\Http\Config\Config;
+use App\Http\Constants;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -38,6 +39,8 @@ class Controller extends BaseController
     private static $_clientName;
     private static $json;
     private static $_config;
+    private static $_context;
+    private static $_bindingMessage;
 
     public function __construct()
     {
@@ -57,6 +60,9 @@ class Controller extends BaseController
         Controller::$_apiVersion = Controller::$_config->getApiVersion();
         Controller::$_clientName = Controller::$_config->getClientName();
         Controller::$_scopes = Controller::$_config->getScopes();
+        Controller::$_context = Controller::$_config->getContext();
+        Controller::$_bindingMessage = Controller::$_config->getBindingMessage();
+
         if (Controller::$_mobileConnect == null) {
             Controller::$_mobileConnect = new MobileConnectWebInterface($discoveryService, $authentication, $identity, $jwks, Controller::$_config->getMcConfig());
         }
@@ -66,10 +72,10 @@ class Controller extends BaseController
 
     // Route "start_discovery"
     public function StartDiscovery(Request $request) {
-        $msisdn = Input::get("msisdn");
-        $mcc = Input::get("mcc");
-        $mnc = Input::get("mnc");
-        $sourceIp = Input::get("sourceIp");
+        $msisdn = Input::get(Constants::MSISDN);
+        $mcc = Input::get(Constants::MCC);
+        $mnc = Input::get(Constants::MNC);
+        $sourceIp = Input::get(Constants::SOURCE_IP);
 
         return $this->AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request);
     }
@@ -125,22 +131,15 @@ class Controller extends BaseController
 
 
     // Route "start_authentication"
-    public function StartAuthentication($sdkSession, $subscriberId , $scope, $clientName ) {
-        if(Controller::$_apiVersion != 'mc_v1.1') {
-            $options = new MobileConnectRequestOptions();
-            $options->setScope($scope);
-            $options->setContext("demo");
-            $options->setBindingMessage("demo auth");
-            $options->setClientName($clientName);
-            $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
+    public function StartAuthentication($sdkSession, $subscriberId) {
+            $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, Controller::getMcOptions());
             return WdController::CreateResponse($response);
-        }
-        else{
-            $options = new MobileConnectRequestOptions();
-            $options->setScope("openid");
-            $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
-            return WdController::CreateResponse($response);
-        }
+    }
+
+    // Route "start_authorisation"
+    public function StartAuthorisation($sdkSession, $subscriberId) {
+        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, Controller::getMcOptions());
+        return WdController::CreateResponse($response);
     }
 
     // Route "user_info"
@@ -185,5 +184,15 @@ class Controller extends BaseController
             return WdController::CreateResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
 
         }
+    }
+
+    private static function getMcOptions()    {
+        $_options = new MobileConnectRequestOptions();
+        $_options->getAuthenticationOptions()->setVersion(Controller::$_apiVersion);
+        $_options->setScope(Controller::$_scopes);
+        $_options->setContext((Controller::$_apiVersion == Constants::VERSION_2_0 || Controller::$_apiVersion == Constants::VERSION_DI_2_3) ? Controller::$_context : null);
+        $_options->setBindingMessage((Controller::$_apiVersion == Constants::VERSION_2_0 || Controller::$_apiVersion == Constants::VERSION_DI_2_3) ? Controller::$_bindingMessage : null);
+        $_options->setClientName(Controller::$_clientName);
+        return $_options;
     }
 }
