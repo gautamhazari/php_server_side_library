@@ -218,7 +218,7 @@ class MobileConnectWebInterface
 
         if (empty($discoveryResponse))
         {
-            return GetCacheError();
+            return $this->GetCacheError();
         }
 
         return $this->RequestUserInfoByDiscoveryResponse($discoveryResponse, $accessToken, $options);

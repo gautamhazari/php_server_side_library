@@ -16,10 +16,11 @@ Route::get('/', function () {
 });
 
 Route::get('/start_discovery', 'Controller@StartDiscovery');
+Route::get('/start_discovery_manually', 'WdController@StartAuthenticationWithoutDiscovery');
 Route::get('/start_authentication', 'Controller@StartAuthentication');
 Route::get('/start_authorization', 'Controller@StartAuthorization');
-Route::get('/start_authentication_wd', 'WdController@StartAuthentication');
-Route::get('/start_authorization_wd', 'WdController@StartAuthorisation');
+Route::get('/start_wd_authentication', 'WdController@StartAuthentication');
+Route::get('/start_wd_authorization', 'WdController@StartAuthorisation');
 Route::get('/user_info', 'Controller@RequestUserInfo');
 Route::get('/identity', 'Controller@RequestIdentity');
 Route::get('/user_info_wd', 'WdController@RequestUserInfo');

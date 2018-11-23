@@ -5,6 +5,8 @@ require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
 
 use App\Http\Config\Config;
 use App\Http\Constants;
+use App\Http\HttpUtils;
+use App\Http\McUtils;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\Input;
 use MCSDK\Authentication\AuthenticationService;
 use MCSDK\Authentication\JWKeysetService;
 use MCSDK\Cache\Cache;
+use MCSDK\Constants\Scope;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\DiscoveryService;
 use MCSDK\Identity\IdentityService;
@@ -22,6 +25,7 @@ use MCSDK\MobileConnectStatus;
 use MCSDK\MobileConnectWebInterface;
 use MCSDK\Utils\MobileConnectResponseType;
 use MCSDK\Utils\RestClient;
+use MCSDK\Web\ResponseConverter;
 
 
 class Controller extends BaseController
@@ -42,6 +46,7 @@ class Controller extends BaseController
     private static $_context;
     private static $_bindingMessage;
 
+
     public function __construct()
     {
         $cache = new Cache();
@@ -55,7 +60,8 @@ class Controller extends BaseController
         $identity = new IdentityService(new RestClient());
         $jwks = new JWKeysetService(new RestClient(), $discoveryService->getCache());
 
-//        Controller::$_xRedirect = $json["xRedirect"];
+
+//        Controller::$_xRedirect = Controller::$_config->isXredirect();
         Controller::$_includeReqIp = Controller::$_config->isIncludeRequestIP();
         Controller::$_apiVersion = Controller::$_config->getApiVersion();
         Controller::$_clientName = Controller::$_config->getClientName();
@@ -84,11 +90,11 @@ class Controller extends BaseController
         $databaseHelper = new DatabaseHelper();
         $options = new MobileConnectRequestOptions();
         $options->setClientIp($sourceIp);
-// Ask about it ???
+//TODO: Ask about it ???
 //        $options->getDiscoveryOptions()->setXRedirect(Controller::$_xRedirect);
         $response = Controller::$_mobileConnect->AttemptDiscovery($request, $msisdn, $mcc, $mnc, Controller::$_includeReqIp, true, $options);
 
-        if($response->getDiscoveryResponse() == null || ($_SERVER['REDIRECT_STATUS'] != 200 )) {
+        if($response->getDiscoveryResponse() == null || ($_SERVER[Constants::REDIRECT_STATUS] != 200 )) {
             if (!empty($response->getUrl())) {
                 return redirect($response->getUrl());
             } else {
@@ -103,15 +109,15 @@ class Controller extends BaseController
         if($response->getResponseType() == MobileConnectResponseType::StartAuthentication) {
             $this->setCacheByRequest($mcc, $mnc, $sourceIp, $msisdn, $response->getDiscoveryResponse());
 
-            $authResponse = $this->StartAuthentication($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()['subscriber_id'],
-                Controller::$_scopes, Controller::$_clientName);
+            $authResponse = $this->StartAuth($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()[Constants::SUB_ID],
+                Controller::$_config);
             $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $response->getDiscoveryResponse());
             $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
             return redirect($authResponse->getUrl());
 
         }
 
-        return WdController::CreateResponse($response);
+        return HttpUtils::CreateResponse($response);
     }
 
     private function setCacheByRequest($mcc, $mnc, $ip, $msisdn, $discoveryResponse){
@@ -129,70 +135,87 @@ class Controller extends BaseController
         }
     }
 
-
-    // Route "start_authentication"
-    public function StartAuthentication($sdkSession, $subscriberId) {
-            $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, Controller::getMcOptions());
-            return WdController::CreateResponse($response);
+    private function StartAuth($sdkSession, $subscriberId, $_config) {
+        $_options = McUtils::getMcOptions($_config);
+        if ($_config->getScopes() == Scope::AUTHZ) {
+            $response = $this->StartAuthorisation($sdkSession, $subscriberId, $_options);
+        } else {
+            $response = $this->StartAuthentication($sdkSession, $subscriberId, $_options);
+        }
+        return $response;
     }
 
-    // Route "start_authorisation"
-    public function StartAuthorisation($sdkSession, $subscriberId) {
-        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, Controller::getMcOptions());
-        return WdController::CreateResponse($response);
+    public function StartAuthentication($sdkSession, $subscriberId, $_options) {
+            $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $_options);
+            return HttpUtils::CreateResponse($response);
+    }
+
+    public function StartAuthorisation($sdkSession, $subscriberId, $_options) {
+        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $_options);
+        return HttpUtils::CreateResponse($response);
     }
 
     // Route "user_info"
     public function RequestUserInfo($sdkSession = null, $accessToken = null) {
         $response = Controller::$_mobileConnect->RequestUserInfo($sdkSession, $accessToken, new MobileConnectRequestOptions());
-        return WdController::CreateResponse($response);
+        return HttpUtils::CreateResponse($response);
     }
 
     // Route "identity"
     public function RequestIdentity($sdkSession = null, $accessToken = null) {
         $response =  Controller::$_mobileConnect->RequestIdentity($sdkSession, $accessToken, new MobileConnectRequestOptions());
-        return WdController::CreateResponse($response);
+        return HttpUtils::CreateResponse($response);
     }
 
     // Route ""
     public function HandleRedirect(Request $request) {
-        $mcc_mnc = Input::get("mcc_mnc");
-        $code = Input::get("code");
-        $state = Input::get("state");
+        $mcc_mnc = Input::get(Constants::MCC_MNC);
+        $code = Input::get(Constants::CODE);
+        $state = Input::get(Constants::STATE);
         $databaseHelper =  new DatabaseHelper();
         $requestUri = $request->getRequestUri();
         if(!empty($code)){
             $discoveryResponse = $databaseHelper->getDiscoveryResponseFromDatabase($state);
             $nonce = $databaseHelper->getNonceFromDatabase($state);
             $response = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, $discoveryResponse, $state, $nonce, new MobileConnectRequestOptions());
-            return WdController::CreateResponse($response);
+            $mobileConnectWebResponse = ResponseConverter::Convert($response);
+
+//            if (Controller::$_apiVersion == (DefaultOptions::VERSION_1_1) & !empty($discoveryResponse->getOperatorUrls()->getUserInfoUrl())) {
+//                foreach ( Constants::USERINFO_SCOPES as $userInfoScope) {
+//                    if (Controller::$_scopes == $userInfoScope) {
+//                        $status = Controller::$_mobileConnect->RequestUserInfo($response->getSDKSession(), $discoveryResponse,
+//                            $mobileConnectWebResponse->getToken());
+//                        return HttpUtils::CreateResponse($status);
+//                    }
+//                }
+//
+//            } else if ((Controller::$_apiVersion == (DefaultOptions::VERSION_DI_2_3) || apiVersion == (DefaultOptions::VERSION_2_0)) & !empty($discoveryResponse->getOperatorUrls()->getPremiumInfoUrl())) {
+//                foreach (Constants::IDENTITY_SCOPES as $identityScope) {
+//                    if (Controller::$_scopes == $identityScope) {
+//                        $status = Controller::$_mobileConnect->RequestIdentity($response->getSDKSession(), $discoveryResponse,
+//                            $mobileConnectWebResponse->getToken());
+//                        return HttpUtils::CreateResponse($status);
+//                    }
+//                }
+//            }
+
+            return HttpUtils::CreateResponse($response);
+
         } elseif (!empty($mcc_mnc)){
             $response = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, null, $state, null, new MobileConnectRequestOptions());
-            $data = explode("_",$mcc_mnc);
-            $mcc = $data[0];
-            $mnc = $data[1];
-            $authResponse = $this->StartAuthentication($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()['subscriber_id'],
-                Controller::$_scopes, Controller::$_clientName);
+            $authResponse = $this->StartAuth($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()[Constants::SUB_ID],
+                Controller::$_config);
             $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $response->getDiscoveryResponse());
             $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
             return redirect($authResponse->getUrl());
         }
         else{
-            $errorCode = Input::get("error");
-            $errorDesc = Input::get("error_description");
+            $errorCode = Input::get(Constants::ERROR);
+            $errorDesc = Input::get(Constants::ERROR_DESCR);
             $databaseHelper->clearDiscoveryCacheByState($state);
-            return WdController::CreateResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
+            return HttpUtils::CreateResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
 
         }
     }
 
-    private static function getMcOptions()    {
-        $_options = new MobileConnectRequestOptions();
-        $_options->getAuthenticationOptions()->setVersion(Controller::$_apiVersion);
-        $_options->setScope(Controller::$_scopes);
-        $_options->setContext((Controller::$_apiVersion == Constants::VERSION_2_0 || Controller::$_apiVersion == Constants::VERSION_DI_2_3) ? Controller::$_context : null);
-        $_options->setBindingMessage((Controller::$_apiVersion == Constants::VERSION_2_0 || Controller::$_apiVersion == Constants::VERSION_DI_2_3) ? Controller::$_bindingMessage : null);
-        $_options->setClientName(Controller::$_clientName);
-        return $_options;
-    }
 }
