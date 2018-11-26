@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
 
 use App\Http\Config\Config;
-use App\Http\Constants;
+use App\Http\Config\JsonFromFile;
+use App\Http\ConfigUtils;
+use App\Http\Constants\Constants;
+use App\Http\DatabaseHelper;
 use App\Http\HttpUtils;
 use App\Http\McUtils;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -16,6 +19,7 @@ use Illuminate\Support\Facades\Input;
 use MCSDK\Authentication\AuthenticationService;
 use MCSDK\Authentication\JWKeysetService;
 use MCSDK\Cache\Cache;
+use MCSDK\Constants\DefaultOptions;
 use MCSDK\Constants\Scope;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\DiscoveryService;
@@ -60,7 +64,6 @@ class Controller extends BaseController
         $identity = new IdentityService(new RestClient());
         $jwks = new JWKeysetService(new RestClient(), $discoveryService->getCache());
 
-
 //        Controller::$_xRedirect = Controller::$_config->isXredirect();
         Controller::$_includeReqIp = Controller::$_config->isIncludeRequestIP();
         Controller::$_apiVersion = Controller::$_config->getApiVersion();
@@ -73,8 +76,6 @@ class Controller extends BaseController
             Controller::$_mobileConnect = new MobileConnectWebInterface($discoveryService, $authentication, $identity, $jwks, Controller::$_config->getMcConfig());
         }
     }
-
-
 
     // Route "start_discovery"
     public function StartDiscovery(Request $request) {
@@ -145,25 +146,13 @@ class Controller extends BaseController
         return $response;
     }
 
-    public function StartAuthentication($sdkSession, $subscriberId, $_options) {
-            $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $_options);
-            return HttpUtils::CreateResponse($response);
-    }
-
-    public function StartAuthorisation($sdkSession, $subscriberId, $_options) {
+    private function StartAuthentication($sdkSession, $subscriberId, $_options) {
         $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $_options);
         return HttpUtils::CreateResponse($response);
     }
 
-    // Route "user_info"
-    public function RequestUserInfo($sdkSession = null, $accessToken = null) {
-        $response = Controller::$_mobileConnect->RequestUserInfo($sdkSession, $accessToken, new MobileConnectRequestOptions());
-        return HttpUtils::CreateResponse($response);
-    }
-
-    // Route "identity"
-    public function RequestIdentity($sdkSession = null, $accessToken = null) {
-        $response =  Controller::$_mobileConnect->RequestIdentity($sdkSession, $accessToken, new MobileConnectRequestOptions());
+    private function StartAuthorisation($sdkSession, $subscriberId, $_options) {
+        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $_options);
         return HttpUtils::CreateResponse($response);
     }
 
@@ -172,32 +161,21 @@ class Controller extends BaseController
         $mcc_mnc = Input::get(Constants::MCC_MNC);
         $code = Input::get(Constants::CODE);
         $state = Input::get(Constants::STATE);
+//        return Input::get("session_id");
         $databaseHelper =  new DatabaseHelper();
         $requestUri = $request->getRequestUri();
         if(!empty($code)){
             $discoveryResponse = $databaseHelper->getDiscoveryResponseFromDatabase($state);
             $nonce = $databaseHelper->getNonceFromDatabase($state);
-            $response = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, $discoveryResponse, $state, $nonce, new MobileConnectRequestOptions());
-            $mobileConnectWebResponse = ResponseConverter::Convert($response);
+            $authStatus = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, $discoveryResponse, $state, $nonce, new MobileConnectRequestOptions());
 
-//            if (Controller::$_apiVersion == (DefaultOptions::VERSION_1_1) & !empty($discoveryResponse->getOperatorUrls()->getUserInfoUrl())) {
-//                foreach ( Constants::USERINFO_SCOPES as $userInfoScope) {
-//                    if (Controller::$_scopes == $userInfoScope) {
-//                        $status = Controller::$_mobileConnect->RequestUserInfo($response->getSDKSession(), $discoveryResponse,
-//                            $mobileConnectWebResponse->getToken());
-//                        return HttpUtils::CreateResponse($status);
-//                    }
-//                }
-//
-//            } else if ((Controller::$_apiVersion == (DefaultOptions::VERSION_DI_2_3) || apiVersion == (DefaultOptions::VERSION_2_0)) & !empty($discoveryResponse->getOperatorUrls()->getPremiumInfoUrl())) {
-//                foreach (Constants::IDENTITY_SCOPES as $identityScope) {
-//                    if (Controller::$_scopes == $identityScope) {
-//                        $status = Controller::$_mobileConnect->RequestIdentity($response->getSDKSession(), $discoveryResponse,
-//                            $mobileConnectWebResponse->getToken());
-//                        return HttpUtils::CreateResponse($status);
-//                    }
-//                }
-//            }
+            $endPointStatus = $this-> StartEndpointRequest($discoveryResponse, $authStatus);
+
+            if (!empty($endPointStatus)) {
+                return HttpUtils::CreateResponse($endPointStatus);
+            } else {
+                return HttpUtils::CreateResponse($authStatus);
+            }
 
             return HttpUtils::CreateResponse($response);
 
@@ -216,6 +194,40 @@ class Controller extends BaseController
             return HttpUtils::CreateResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
 
         }
+    }
+
+    private function StartEndpointRequest($discoveryResponse, $authResponse) {
+        $status = null;
+        $mobileConnectWebResponse = ResponseConverter::Convert($authResponse);
+        if (Controller::$_apiVersion == (DefaultOptions::VERSION_1_1) & !empty($discoveryResponse->getOperatorUrls()->getUserInfoUrl())) {
+            $status = $this-> RequestUserInfo($discoveryResponse, $mobileConnectWebResponse);
+        } else if ((Controller::$_apiVersion == (DefaultOptions::VERSION_DI_2_3) || apiVersion == (DefaultOptions::VERSION_2_0)) & !empty($discoveryResponse->getOperatorUrls()->getPremiumInfoUrl())) {
+            $status = $this-> RequestIdentity($discoveryResponse, $mobileConnectWebResponse);
+        }
+        return $status;
+    }
+
+    private function RequestUserInfo($discoveryResponse, $mobileConnectWebResponse) {
+        foreach ( Constants::USERINFO_SCOPES as $userInfoScope) {
+            if ( strpos(Controller::$_scopes, $userInfoScope) !== false) {
+                $status = Controller::$_mobileConnect->RequestUserInfoByDiscoveryResponse($discoveryResponse, $mobileConnectWebResponse->getToken()[Constants::ACCESS_TOKEN], new MobileConnectRequestOptions());
+                return $status;
+            }
+        }
+    }
+
+    private function RequestIdentity($discoveryResponse, $mobileConnectWebResponse) {
+        foreach (Constants::IDENTITY_SCOPES as $identityScope) {
+            if (strpos(Controller::$_scopes, $identityScope) !== false) {
+                $status = Controller::$_mobileConnect->RequestIdentityByDiscoveryResponse($discoveryResponse, $mobileConnectWebResponse->getToken()[Constants::ACCESS_TOKEN], new MobileConnectRequestOptions());
+                return $status;
+            }
+        }
+    }
+
+    // Route "sector_identifier_uri"
+    public function GetSectorIdentifierUri()  {
+        return ConfigUtils::getStringFromFile(Constants::SECTOR_IDENTIFIER_PATH);
     }
 
 }

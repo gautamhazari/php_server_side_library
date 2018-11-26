@@ -1,7 +1,7 @@
 {
 	"msisdn": "+447700900312",
-	"clientID": "f9119721-47ad-4582-b91e-d4b544851c02",
-	"clientSecret": "969ad6f3-8250-4ce0-9521-f0dfbe146941",
+	"clientID": "3e217278-4241-468b-ba36-3e2b7d39f92e",
+	"clientSecret": "130757ae-89f9-4591-b0c0-6052ab1c3922",
 	"discoveryURL": "https://discovery.sandbox.mobileconnect.io/v2/discovery",
 	"redirectURL": "http://localhost/php-server-side-library/public/callback",
 	"xRedirect": "False",

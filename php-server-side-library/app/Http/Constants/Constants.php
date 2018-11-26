@@ -6,7 +6,7 @@
  * Time: 16.13
  */
 
-namespace App\Http;
+namespace App\Http\Constants;
 
 use MCSDK\Constants\Scope;
 
@@ -24,7 +24,7 @@ class Constants
 
     public const CODE = "code";
     public const STATE = "state";
-    public const ACCESS_TOKEN = "accessToken";
+    public const ACCESS_TOKEN = "access_token";
 
     public const CLIENT_ID = "clientID";
     public const CLIENT_SECRET = "clientSecret";
@@ -45,6 +45,8 @@ class Constants
 
     public const REDIRECT_STATUS = "REDIRECT_STATUS";
     public const CONFIG_DIR_NAME = "data";
+
+    public const SECTOR_IDENTIFIER_PATH = "sector_identifier_uri.json";
 
     public const IDENTITY_SCOPES = array(Scope::IDENTITY_PHONE, Scope::IDENTITY_SIGNUP,
             Scope::IDENTITY_NATIONALID, Scope::IDENTITY_SIGNUPPLUS, Scope::KYC_HASHED, Scope::KYC_PLAIN);

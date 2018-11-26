@@ -23,8 +23,6 @@ class HttpUtils
             $clear_json = (object)array_filter((array)$json);
             return response()->json($clear_json);
         }
-
     }
-
 }
 

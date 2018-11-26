@@ -8,7 +8,7 @@
 
 namespace App\Http\Config;
 
-use App\Http\Constants;
+use App\Http\Constants\Constants;
 use MCSDK\Discovery\OperatorUrls;
 
 class ConfigWd extends BaseConfig

@@ -9,7 +9,8 @@
 namespace App\Http\Config;
 
 
-use App\Http\Constants;
+use App\Http\ConfigUtils;
+use App\Http\Constants\Constants;
 use MCSDK\MobileConnectConfig;
 
 abstract class BaseConfig
@@ -28,7 +29,7 @@ abstract class BaseConfig
 
     public function getJsonFromFile(String $fileName)
     {
-        $string = file_get_contents(dirname(dirname(dirname(__FILE__))).DIRECTORY_SEPARATOR.Constants::CONFIG_DIR_NAME.DIRECTORY_SEPARATOR.$fileName);
+        $string = ConfigUtils::getStringFromFile($fileName);
         return json_decode($string, true);
     }
 
