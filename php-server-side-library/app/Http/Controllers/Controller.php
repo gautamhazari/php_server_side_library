@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
 
+use App\Http\Claims\KYCClaimsParameter;
 use App\Http\Config\Config;
 use App\Http\Config\JsonFromFile;
 use App\Http\ConfigUtils;
@@ -87,15 +88,17 @@ class Controller extends BaseController
         return $this->AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request);
     }
 
-    private function AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request){
+    private function AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request)
+    {
         $databaseHelper = new DatabaseHelper();
         $options = new MobileConnectRequestOptions();
         $options->setClientIp($sourceIp);
+
 //TODO: Ask about it ???
 //        $options->getDiscoveryOptions()->setXRedirect(Controller::$_xRedirect);
         $response = Controller::$_mobileConnect->AttemptDiscovery($request, $msisdn, $mcc, $mnc, Controller::$_includeReqIp, true, $options);
 
-        if($response->getDiscoveryResponse() == null || ($_SERVER[Constants::REDIRECT_STATUS] != 200 )) {
+        if ($response->getDiscoveryResponse() == null || ($_SERVER[Constants::REDIRECT_STATUS] != 200)) {
             if (!empty($response->getUrl())) {
                 return redirect($response->getUrl());
             } else {
@@ -107,18 +110,26 @@ class Controller extends BaseController
 
         }
 
-        if($response->getResponseType() == MobileConnectResponseType::StartAuthentication) {
+        if ($response->getResponseType() == MobileConnectResponseType::StartAuthentication) {
             $this->setCacheByRequest($mcc, $mnc, $sourceIp, $msisdn, $response->getDiscoveryResponse());
 
             $authResponse = $this->StartAuth($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()[Constants::SUB_ID],
                 Controller::$_config);
-            $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $response->getDiscoveryResponse());
-            $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
-            return redirect($authResponse->getUrl());
 
+            if ($this->isErrorInResponce($authResponse)) {
+                return $authResponse;
+            } else {
+                $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $response->getDiscoveryResponse());
+                $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
+                return redirect($authResponse->getUrl());
+            }
         }
 
         return HttpUtils::CreateResponse($response);
+    }
+
+    private function isErrorInResponce($response) {
+        return !empty(json_decode($response->content(), true)[Constants::ERROR])? true : false;
     }
 
     private function setCacheByRequest($mcc, $mnc, $ip, $msisdn, $discoveryResponse){
@@ -138,7 +149,10 @@ class Controller extends BaseController
 
     private function StartAuth($sdkSession, $subscriberId, $_config) {
         $_options = McUtils::getMcOptions($_config);
-        if ($_config->getScopes() == Scope::AUTHZ) {
+
+        if (strpos($_config->getScopes(), Scope::KYC) !== false) {
+            $response = $this->StartKYC($sdkSession, $subscriberId, $_options);
+        } else if (strpos($_config->getScopes(), Scope::AUTHZ) !== false) {
             $response = $this->StartAuthorisation($sdkSession, $subscriberId, $_options);
         } else {
             $response = $this->StartAuthentication($sdkSession, $subscriberId, $_options);
@@ -146,13 +160,22 @@ class Controller extends BaseController
         return $response;
     }
 
-    private function StartAuthentication($sdkSession, $subscriberId, $_options) {
-        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $_options);
+    private function StartAuthentication($sdkSession, $subscriberId, $options) {
+        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
         return HttpUtils::CreateResponse($response);
     }
 
-    private function StartAuthorisation($sdkSession, $subscriberId, $_options) {
-        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $_options);
+    private function StartAuthorisation($sdkSession, $subscriberId, $options) {
+        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
+        return HttpUtils::CreateResponse($response);
+    }
+
+    private function StartKYC($sdkSession, $subscriberId, $options) {
+        $kycClaims = new KYCClaimsParameter();
+        $kycClaims->setName("henrydorsettcase");
+//                  ->setAddress("119840701chibacityjapan");
+        $options->setClaims($kycClaims);
+        $response = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
         return HttpUtils::CreateResponse($response);
     }
 

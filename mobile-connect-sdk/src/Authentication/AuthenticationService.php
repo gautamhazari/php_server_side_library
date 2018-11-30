@@ -25,25 +25,21 @@
 
 namespace MCSDK\Authentication;
 
-use MCSDK\Utils\RestClient;
-use MCSDK\Utils\CurlRestClient;
-use MCSDK\Constants\Scope;
-use MCSDK\Constants\Parameters;
 use MCSDK\Constants\DefaultOptions;
-use MCSDK\Authentication\IAuthenticationService;
-use MCSDK\Utils\ValidationUtils;
-use MCSDK\Utils\UriBuilder;
-use MCSDK\MobileConnectConstants;
-use MCSDK\Utils\RestAuthentication;
-use MCSDK\Utils\MobileConnectVersions;
-use MCSDK\Utils\Scopes;
+use MCSDK\Constants\GrantTypes;
+use MCSDK\Constants\Parameters;
+use MCSDK\Constants\Scope;
 use MCSDK\Discovery\SupportedVersions;
-use MCSDK\Utils\HttpUtils;
 use MCSDK\Exceptions\MobileConnectEndpointHttpException;
 use MCSDK\Exceptions\OperationCancellationException;
-use MCSDK\Authentication\RevokeTokenResponse;
-use MCSDK\Constants\GrantTypes;
-use PhpParser\Node\Expr\Cast\Object_;
+use MCSDK\MobileConnectConstants;
+use MCSDK\Utils\CurlRestClient;
+use MCSDK\Utils\HttpUtils;
+use MCSDK\Utils\RestAuthentication;
+use MCSDK\Utils\RestClient;
+use MCSDK\Utils\Scopes;
+use MCSDK\Utils\UriBuilder;
+use MCSDK\Utils\ValidationUtils;
 
 /**
  * Concrete implementation of IAuthenticationService
@@ -68,6 +64,8 @@ class AuthenticationService implements IAuthenticationService {
         ValidationUtils::validateParameter($redirectUrl, "redirectUrl");
         ValidationUtils::validateParameter($state, "state");
         ValidationUtils::validateParameter($nonce, "nonce");
+
+        $this->validateKycParams($options);
 
         if (empty($options)) {
             $options = new AuthenticationOptions();
@@ -105,6 +103,43 @@ class AuthenticationService implements IAuthenticationService {
         $response = new StartAuthenticationResponse();
         $response->setUrl($build->getUri());
         return $response;
+    }
+
+    private function validateKycParams($options) {
+        $kycClaims = $options->getClaims();
+        if((strpos($options->getScope(), Scope::KYC_PLAIN) !== false) && ($options->getVersion() == DefaultOptions::VERSION_DI_2_3)) {
+            if (!empty($kycClaims->getName())) {
+                ValidationUtils::validateParameter($kycClaims->getAddress(), "address");
+            }
+            else if (!empty($kycClaims->getGivenName())) {
+                ValidationUtils::validateParameter($kycClaims->getFamilyName(), "family_name");
+                ValidationUtils::validateParameter($kycClaims->getHousenoOrHousename(), "houseno_or_housename");
+                ValidationUtils::validateParameter($kycClaims->getPostalCode(), "postal_code");
+                ValidationUtils::validateParameter($kycClaims->getCountry(), "country");
+                ValidationUtils::validateParameter($kycClaims->getTown(), "town");
+            }
+            else {
+                ValidationUtils::validateParameter($kycClaims->getName(), "name");
+                ValidationUtils::validateParameter($kycClaims->getGivenName(), "given_name");
+            }
+        }
+
+        if((strpos($options->getScope(), Scope::KYC_HASHED) !== false) && ($options->getVersion() == DefaultOptions::VERSION_DI_2_3)) {
+            if (!empty($kycClaims->getNameHashed())) {
+                ValidationUtils::validateParameter($kycClaims->getAddressHashed(), "address_hashed");
+            }
+            else if (!empty($options->getKycClaims()->getGivenNameHashed())) {
+                ValidationUtils::validateParameter($kycClaims->getFamilyNameHashed(), "family_name_hashed");
+                ValidationUtils::validateParameter($kycClaims->getHousenoOrHousenameHashed(), "houseno_or_housename_hashed");
+                ValidationUtils::validateParameter($kycClaims->getPostalCodeHashed(), "postal_code_hashed");
+                ValidationUtils::validateParameter($kycClaims->getCountryHashed(), "country_hashed");
+                ValidationUtils::validateParameter($kycClaims->getTownHashed(), "town_hashed");
+            }
+            else {
+                ValidationUtils::validateParameter($kycClaims->getNameHashed(), "name_hashed");
+                ValidationUtils::validateParameter($kycClaims->getGivenNameHashed(), "given_name_hashed");
+            }
+        }
     }
 
     public function RequestToken($clientId, $clientSecret, $requestTokenUrl, $redirectUrl, $code) {
@@ -195,7 +230,7 @@ class AuthenticationService implements IAuthenticationService {
     }
 
     private function getClaimsString($options) {
-        return null;
+        return $options->getClaims()->toJson();
     }
 
     /**

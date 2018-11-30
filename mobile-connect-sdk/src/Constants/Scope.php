@@ -30,6 +30,7 @@ class Scope
     const OPENID = "openid";
     const AUTHN = "mc_authn";
     const AUTHZ = "mc_authz";
+    const KYC = "mc_kyc";
 
     const PROFILE = "profile";
     const EMAIL = "email";

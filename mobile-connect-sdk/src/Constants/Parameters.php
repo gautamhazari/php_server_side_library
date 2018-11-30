@@ -85,5 +85,32 @@ class Parameters
 
     const ACCESS_TOKEN_HINT = "access_token";
     const REFRESH_TOKEN_HINT = "refresh_token";
+
+    //Params for KYC
+    const VALUE = "value";
+    const  NAME = "name";
+    const  GIVEN_NAME = "given_name";
+    const FAMILY_NAME = "family_name";
+    const ADDRESS = "address";
+    const HOUSENO_OR_HOUSENAME = "houseno_or_housename";
+    const POSTAL_CODE = "postal_code";
+    const TOWN = "town";
+    const COUNTRY = "country";
+    const BIRTHDATE = "birthdate";
+
+    const NAME_HASHED = "name_hashed";
+    const GIVEN_NAME_HASHED = "given_name_hashed";
+    const FAMILY_NAME_HASHED = "family_name_hashed";
+    const ADDRESS_HASHED = "address_hashed";
+    const HOUSENO_OR_HOUSENAME_HASHED = "houseno_or_housename_hashed";
+    const POSTAL_CODE_HASHED = "postal_code_hashed";
+    const TOWN_HASHED = "town_hashed";
+    const COUNTRY_HASHED = "country_hashed";
+    const BIRTHDATE_HASHED = "birthdate_hashed";
+
+    const IS_LOST_STOLEN = "is_lost_stolen";
+    const BILLING_SEGMENT = "billing_segment";
+    const ACCOUNT_STATE = "account_state";
+
 }
 
