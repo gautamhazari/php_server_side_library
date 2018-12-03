@@ -63,7 +63,7 @@ class Controller extends BaseController
     }
 
     // Route "start_discovery"
-    public function StartDiscovery(Request $request) {
+    public function startDiscovery(Request $request) {
         $msisdn = Input::get(Constants::MSISDN);
         $mcc = Input::get(Constants::MCC);
         $mnc = Input::get(Constants::MNC);
@@ -71,7 +71,7 @@ class Controller extends BaseController
         return $this->AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request);
     }
 
-    private function AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request)
+    private function attemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request)
     {
         $databaseHelper = new DatabaseHelper();
         $options = new MobileConnectRequestOptions();
@@ -105,7 +105,7 @@ class Controller extends BaseController
     }
 
     // Route ""
-    public function HandleRedirect(Request $request) {
+    public function handleRedirect(Request $request) {
         $mcc_mnc = Input::get(Constants::MCC_MNC);
         $code = Input::get(Constants::CODE);
         $state = Input::get(Constants::STATE);
@@ -138,7 +138,7 @@ class Controller extends BaseController
         }
     }
 
-    private function StartAuth($sdkSession, $subscriberId, $_config) {
+    private function startAuth($sdkSession, $subscriberId, $_config) {
         $_options = McUtils::getMcOptions($_config);
 
         if (strpos($_config->getScopes(), Scope::KYC) !== false) {
@@ -151,17 +151,17 @@ class Controller extends BaseController
         return $status;
     }
 
-    private function StartAuthentication($sdkSession, $subscriberId, $options) {
+    private function startAuthentication($sdkSession, $subscriberId, $options) {
         $status = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
         return $status;
     }
 
-    private function StartAuthorisation($sdkSession, $subscriberId, $options) {
+    private function startAuthorisation($sdkSession, $subscriberId, $options) {
         $status = Controller::$_mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);
         return $status;
     }
 
-    private function StartKYC($sdkSession, $subscriberId, $options) {
+    private function startKYC($sdkSession, $subscriberId, $options) {
         $kycClaims = new KYCClaimsParameter();
         $kycClaims->setName(Controller::$_config->getName())
             ->setAddress(Controller::$_config->getAddress());
@@ -171,7 +171,7 @@ class Controller extends BaseController
     }
 
     // Route "sector_identifier_uri"
-    public function GetSectorIdentifierUri()  {
+    public function getSectorIdentifierUri()  {
         return ConfigUtils::getStringFromFile(Constants::SECTOR_IDENTIFIER_PATH);
     }
 

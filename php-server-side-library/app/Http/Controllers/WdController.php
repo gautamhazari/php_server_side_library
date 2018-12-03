@@ -58,7 +58,7 @@ class WdController extends BaseController
     }
 
     // Route "start_discovery_manually"
-    public function StartAuthenticationWithoutDiscovery(Request $request)
+    public function startAuthenticationWithoutDiscovery(Request $request)
     {
         $msisdn = Input::get(Constants::MSISDN);
         $state = WdController::$_mobileConnect->generateUniqueString();
@@ -77,7 +77,7 @@ class WdController extends BaseController
     }
 
     // Route '/callback_wd'
-    public function HandleRedirect(Request $request)
+    public function handleRedirect(Request $request)
     {
         $code = Input::get(Constants::CODE);
         $state = Input::get(Constants::STATE);
