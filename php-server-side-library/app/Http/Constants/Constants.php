@@ -47,6 +47,9 @@ class Constants
     public const CONFIG_DIR_NAME = "data";
 
     public const SECTOR_IDENTIFIER_PATH = "sector_identifier_uri.json";
+    public const KYC_CLAIMS_PATH = "kycClaims.json";
+    public const DATA_PATH = "data.json";
+    public const WD_DATA_PATH = "withoutDiscoveryData.json";
 
     public const IDENTITY_SCOPES = array(Scope::IDENTITY_PHONE, Scope::IDENTITY_SIGNUP,
             Scope::IDENTITY_NATIONALID, Scope::IDENTITY_SIGNUPPLUS, Scope::KYC_HASHED, Scope::KYC_PLAIN);

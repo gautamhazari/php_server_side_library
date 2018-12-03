@@ -16,7 +16,7 @@ use MCSDK\Web\ResponseConverter;
 
 class HttpUtils
 {
-    public static function CreateResponse(MobileConnectStatus $status)    {
+    public static function createResponse(MobileConnectStatus $status)    {
         if ($status->getState() !== null) return $status;
         else {
             $json = json_decode(JsonUtils::toJson(ResponseConverter::Convert($status)));

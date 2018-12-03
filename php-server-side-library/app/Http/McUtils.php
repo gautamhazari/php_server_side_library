@@ -30,4 +30,24 @@ class McUtils
         $options->setClientName($clientName);
         return $options;
     }
+
+    public static function isErrorInResponse($response) {
+        return !empty($response->getErrorCode())? true : false;
+    }
+
+    public static function setCacheByRequest($mcc, $mnc, $ip, $msisdn, $discoveryResponse){
+        if($discoveryResponse instanceof DiscoveryResponse) {
+            $databaseHelper = new DatabaseHelper();
+            if (!empty($msisdn)) {
+                $databaseHelper->setCachedDiscoveryResponseByMsisdn($msisdn, $discoveryResponse);
+            }
+            if (!empty($mcc) && !empty($mnc)) {
+                $databaseHelper->setCachedDiscoveryResponseByMccMnc($mcc, $mnc, $discoveryResponse);
+            }
+            if (!empty($ip)) {
+                $databaseHelper->setCachedDiscoveryResponseByIp($ip, $discoveryResponse);
+            }
+        }
+    }
+
 }

@@ -8,6 +8,7 @@
 
 namespace App\Http\Config;
 
+use App\Http\ConfigUtils;
 use App\Http\Constants\Constants;
 use MCSDK\Discovery\OperatorUrls;
 
@@ -21,8 +22,13 @@ class ConfigWd extends BaseConfig
     private $operatorUrls;
 
     public function __construct() {
-        $json = $this->getJsonFromFile("withoutDiscoveryData.json");
+        $json = ConfigUtils::getJsonFromFile(Constants::WD_DATA_PATH);
         $this->getCommonValuesFromJson($json);
+        $this->getKycValuesFromFile( Constants::KYC_CLAIMS_PATH);
+        $this->getSpecValuesFromJson($json);
+    }
+
+    private function getSpecValuesFromJson($json) {
         $this->authURL = $json[Constants::AUTH_URL];
         $this->tokenURL = $json[Constants::TOKEN_URL];
         $this->userInfoURl = $json[Constants::USERINFO_URL];
@@ -31,14 +37,13 @@ class ConfigWd extends BaseConfig
     }
 
     public function getOperatorUrls() {
-        if ($this->operatorUrls == null) {
-            $this->operatorUrls = new OperatorUrls();
-            $this->operatorUrls->setAuthorizationUrl($this->authURL);
-            $this->operatorUrls->setRequestTokenUrl($this->tokenURL);
-            $this->operatorUrls->setUserInfoUrl($this->userInfoURl);
-            $this->operatorUrls->setPremiumInfoUrl($this->premiumInfoURl);
-            $this->operatorUrls->setProviderMetadataUrl($this->metadataURl);
-        }
+        $this->operatorUrls = new OperatorUrls();
+        $this->operatorUrls->setAuthorizationUrl($this->authURL);
+        $this->operatorUrls->setRequestTokenUrl($this->tokenURL);
+        $this->operatorUrls->setUserInfoUrl($this->userInfoURl);
+        $this->operatorUrls->setPremiumInfoUrl($this->premiumInfoURl);
+        $this->operatorUrls->setProviderMetadataUrl($this->metadataURl);
+
         return $this->operatorUrls;
     }
 

@@ -230,7 +230,8 @@ class AuthenticationService implements IAuthenticationService {
     }
 
     private function getClaimsString($options) {
-        return $options->getClaims()->toJson();
+        if ($options->getClaims() != null)
+            return $options->getClaims()->toJson();
     }
 
     /**

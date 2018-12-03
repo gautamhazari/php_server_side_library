@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
 
+use App\Http\Claims\KYCClaimsParameter;
 use App\Http\Config\ConfigWd;
 use App\Http\Constants\Constants;
 use App\Http\DatabaseHelper;
+use App\Http\EndpointUtils;
 use App\Http\HttpUtils;
 use App\Http\McUtils;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -15,13 +17,11 @@ use Illuminate\Http\Config;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
-use MCSDK\Constants\DefaultOptions;
 use MCSDK\Constants\Scope;
 use MCSDK\MobileConnectInterfaceFactory;
 use MCSDK\MobileConnectRequestOptions;
 use MCSDK\MobileConnectStatus;
 use MCSDK\MobileConnectWebInterface;
-use MCSDK\Web\ResponseConverter;
 
 
 class WdController extends BaseController
@@ -43,11 +43,9 @@ class WdController extends BaseController
         if (WdController::$_config == null) {
             WdController::$_config = new ConfigWd();
         }
-
         if (WdController::$_databaseHelper == null) {
             WdController::$_databaseHelper = new DatabaseHelper();
         }
-
         if (WdController::$_mobileConnect == null) {
             WdController::$_mobileConnect = MobileConnectInterfaceFactory::buildMobileConnectWebInterfaceWithConfig(WdController::$_config->getMcConfig());
         }
@@ -72,7 +70,7 @@ class WdController extends BaseController
         WdController::$_databaseHelper->writeDiscoveryResponseToDatabase($state, $discoveryResponse);
         WdController::$_databaseHelper->writeNonceToDatabase($state, $nonce);
 
-        $response = $this->StartAuth($discoveryResponse, $state, $nonce, WdController::$_config, $msisdn);
+        $response = $this->startAuth($discoveryResponse, $state, $nonce, WdController::$_config, $msisdn);
 
         return redirect($response->getUrl());
 
@@ -90,70 +88,50 @@ class WdController extends BaseController
             $discoveryResponse = WdController::$_databaseHelper->getDiscoveryResponseFromDatabase($state);
             $nonce = WdController::$_databaseHelper->getNonceFromDatabase($state);
             $authStatus = WdController::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, $discoveryResponse, $state, $nonce, new MobileConnectRequestOptions());
-
-            $endPointStatus = $this-> StartEndpointRequest($discoveryResponse, $authStatus);
+            $endPointStatus = EndpointUtils::startEndpointRequest(WdController::$_mobileConnect, WdController::$_config, $discoveryResponse, $authStatus);
 
             if (!empty($endPointStatus)) {
-                return HttpUtils::CreateResponse($endPointStatus);
+                return HttpUtils::createResponse($endPointStatus);
             } else {
-                return HttpUtils::CreateResponse($authStatus);
+                return HttpUtils::createResponse($authStatus);
             }
 
         } else {
-            return HttpUtils::CreateResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
+            return HttpUtils::createResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
         }
     }
 
-    private function StartAuth($discoveryResponse, $state, $nonce, $_config, $msisdn) {
-        $_options = McUtils::getMcOptions($_config);
+    private function startAuth($discoveryResponse, $state, $nonce, $config, $msisdn) {
+        $options = McUtils::getMcOptions($config);
         if (!empty($msisdn)) {
             $loginHint = sprintf("%s:%s", strtoupper(Constants::MSISDN), $msisdn);
-            $_options->setLoginHint($loginHint);
+            $options->setLoginHint($loginHint);
         }
-
-        if ($_config->getScopes() == Scope::AUTHZ) {
-            $response = $this->StartAuthorisation($discoveryResponse, $state, $nonce, $_options);
+        if (strpos($config->getScopes(), Scope::KYC) !== false) {
+            $status = $this->startKYC($discoveryResponse, $state, $nonce, $options);
+        } else if (strpos($config->getScopes(), Scope::AUTHZ) !== false) {
+            $status = $this->startAuthorisation($discoveryResponse, $state, $nonce, $options);
         } else {
-            $response = $this->StartAuthentication($discoveryResponse, $state, $nonce, $_options);
-        }
-        return $response;
-    }
-
-    private function StartEndpointRequest($discoveryResponse, $authResponse) {
-        $status = null;
-        $mobileConnectWebResponse = ResponseConverter::Convert($authResponse);
-        if (WdController::$_apiVersion == (DefaultOptions::VERSION_1_1) & !empty($discoveryResponse->getOperatorUrls()->getUserInfoUrl())) {
-            $status = $this-> RequestUserInfo($discoveryResponse, $mobileConnectWebResponse);
-        } else if ((WdController::$_apiVersion == (DefaultOptions::VERSION_DI_2_3) || apiVersion == (DefaultOptions::VERSION_2_0)) & !empty($discoveryResponse->getOperatorUrls()->getPremiumInfoUrl())) {
-            $status = $this-> RequestIdentity($discoveryResponse, $mobileConnectWebResponse);
+            $status = $this->startAuthentication($discoveryResponse, $state, $nonce, $options);
         }
         return $status;
     }
 
-    private function StartAuthentication($discoveryResponse, $state, $nonce, $_options) {
-        return WdController::$_mobileConnect->Authentication($discoveryResponse, null, $state, $nonce, $_options);
+    private function startAuthentication($discoveryResponse, $state, $nonce, $options) {
+        return WdController::$_mobileConnect->Authentication($discoveryResponse, null, $state, $nonce, $options);
     }
 
-    private function StartAuthorisation($discoveryResponse, $state, $nonce, $_options) {
-        return WdController::$_mobileConnect->Authentication($discoveryResponse, null, $state, $nonce, $_options);
+    private function startAuthorisation($discoveryResponse, $state, $nonce, $options) {
+        return WdController::$_mobileConnect->Authentication($discoveryResponse, null, $state, $nonce, $options);
     }
 
-    private function RequestUserInfo($discoveryResponse, $mobileConnectWebResponse) {
-        foreach ( Constants::USERINFO_SCOPES as $userInfoScope) {
-            if ( strpos(WdController::$_scopes, $userInfoScope) !== false) {
-                $status = WdController::$_mobileConnect->RequestUserInfoByDiscoveryResponse($discoveryResponse, $mobileConnectWebResponse->getToken()[Constants::ACCESS_TOKEN], new MobileConnectRequestOptions());
-                return $status;
-            }
-        }
-    }
-
-    private function RequestIdentity($discoveryResponse, $mobileConnectWebResponse) {
-        foreach (Constants::IDENTITY_SCOPES as $identityScope) {
-            if (strpos(WdController::$_scopes, $identityScope) !== false) {
-                $status = WdController::$_mobileConnect->RequestIdentityByDiscoveryResponse($discoveryResponse, $mobileConnectWebResponse->getToken()[Constants::ACCESS_TOKEN], new MobileConnectRequestOptions());
-                return $status;
-            }
-        }
+    private function startKYC($discoveryResponse, $state, $nonce, $options) {
+        $kycClaims = new KYCClaimsParameter();
+        $kycClaims->setName(WdController::$_config->getName())
+                ->setAddress(WdController::$_config->getAddress());
+        $options->setClaims($kycClaims);
+        $status = WdController::$_mobileConnect->Authentication($discoveryResponse, null, $state, $nonce, $options);
+        return $status;
     }
 
 }
