@@ -130,7 +130,7 @@ class AuthenticationService implements IAuthenticationService {
             if (!empty($kycClaims->getNameHashed())) {
                 ValidationUtils::validateParameter($kycClaims->getAddressHashed(), Parameters::ADDRESS_HASHED);
             }
-            else if (!empty($options->getKycClaims()->getGivenNameHashed())) {
+            else if (!empty($kycClaims->getGivenNameHashed())) {
                 $params = implode(Constants::SPACE, array(
                     empty($kycClaims->getFamilyNameHashed())? Parameters::FAMILY_NAME_HASHED: null,
                     empty($kycClaims->getHousenoOrHousenameHashed())? Parameters::HOUSENO_OR_HOUSENAME_HASHED: null,
