@@ -66,14 +66,14 @@ class WdController extends BaseController
 
         $discoveryResponse = WdController::$_mobileConnect->makeDiscoveryWithoutCall(WdController::$_config->getClientId(), WdController::$_config->getClientSecret(),
             WdController::$_config->getOperatorUrls(), WdController::$_config->getClientName());
-
-        WdController::$_databaseHelper->writeDiscoveryResponseToDatabase($state, $discoveryResponse);
-        WdController::$_databaseHelper->writeNonceToDatabase($state, $nonce);
-
-        $response = $this->startAuth($discoveryResponse, $state, $nonce, WdController::$_config, $msisdn);
-
-        return redirect($response->getUrl());
-
+        $authResponse = $this->startAuth($discoveryResponse, $state, $nonce, WdController::$_config, $msisdn);
+        if (McUtils::isErrorInResponse($authResponse)) {
+            return HttpUtils::createResponse($authResponse);
+        } else {
+            WdController::$_databaseHelper->writeDiscoveryResponseToDatabase($state, $discoveryResponse);
+            WdController::$_databaseHelper->writeNonceToDatabase($state, $nonce);
+            return redirect($authResponse->getUrl());
+        }
     }
 
     // Route '/callback_wd'
