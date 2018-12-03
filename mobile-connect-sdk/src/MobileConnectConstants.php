@@ -63,4 +63,14 @@ class MobileConnectConstants {
      * Scope value for Identity National ID
      */
     const MOBILECONNECTIDENTITYNATIONALID = "openid mc_identity_nationalid";
+
+    /**
+     * Scope value for Identity National ID
+     */
+    const MOBILECONNECTKYCPLAIN = "openid mc_kyc_plain";
+
+    /**
+     * Scope value for Identity National ID
+     */
+    const MOBILECONNECTKYCHASHED = "openid mc_kyc_hashed";
 }
