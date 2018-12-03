@@ -6,7 +6,7 @@
 	"redirectURL": "http://localhost/php-server-side-library/public/callback",
 	"xRedirect": "False",
 	"includeRequestIP": "True",
-	"scopes":"openid mc_kyc_plain",
+	"scopes":"openid mc_authn",
 	"apiVersion":"mc_di_r2_v2.3",
 	"clientName":"PhpServerSideDemo",
 	"context":"demo",

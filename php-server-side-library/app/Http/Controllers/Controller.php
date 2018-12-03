@@ -122,9 +122,13 @@ class Controller extends BaseController
             $response = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, null, $state, null, new MobileConnectRequestOptions());
             $authResponse = $this->StartAuth($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()[Constants::SUB_ID],
                 Controller::$_config);
-            $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $response->getDiscoveryResponse());
-            $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
-            return redirect($authResponse->getUrl());
+            if (McUtils::isErrorInResponse($authResponse)) {
+                return HttpUtils::createResponse($authResponse);
+            } else {
+                $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $response->getDiscoveryResponse());
+                $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
+                return redirect($authResponse->getUrl());
+            }
         }
         else{
             $errorCode = Input::get(Constants::ERROR);
