@@ -25,6 +25,7 @@
 
 namespace MCSDK\Authentication;
 
+use App\Http\Constants\Constants;
 use MCSDK\Constants\DefaultOptions;
 use MCSDK\Constants\GrantTypes;
 use MCSDK\Constants\Parameters;
@@ -109,35 +110,37 @@ class AuthenticationService implements IAuthenticationService {
         $kycClaims = $options->getClaims();
         if((strpos($options->getScope(), Scope::KYC_PLAIN) !== false) && ($options->getVersion() == DefaultOptions::VERSION_DI_2_3)) {
             if (!empty($kycClaims->getName())) {
-                ValidationUtils::validateParameter($kycClaims->getAddress(), "address");
+                ValidationUtils::validateParameter($kycClaims->getAddress(), Parameters::ADDRESS);
             }
             else if (!empty($kycClaims->getGivenName())) {
-                ValidationUtils::validateParameter($kycClaims->getFamilyName(), "family_name");
-                ValidationUtils::validateParameter($kycClaims->getHousenoOrHousename(), "houseno_or_housename");
-                ValidationUtils::validateParameter($kycClaims->getPostalCode(), "postal_code");
-                ValidationUtils::validateParameter($kycClaims->getCountry(), "country");
-                ValidationUtils::validateParameter($kycClaims->getTown(), "town");
+                $params = implode(Constants::SPACE, array(
+                    empty($kycClaims->getFamilyName())? Parameters::FAMILY_NAME: null,
+                    empty($kycClaims->getHousenoOrHousename())? Parameters::HOUSENO_OR_HOUSENAME: null,
+                    empty($kycClaims->getPostalCode())? Parameters::POSTAL_CODE: null,
+                    empty($kycClaims->getCountry())? Parameters::COUNTRY: null,
+                    empty($kycClaims->getTown())? Parameters::TOWN: null));
+                ValidationUtils::validateParameter(null, $params);
             }
             else {
-                ValidationUtils::validateParameter($kycClaims->getName(), "name");
-                ValidationUtils::validateParameter($kycClaims->getGivenName(), "given_name");
-            }
+                ValidationUtils::validateParameter(null, Parameters::NAME.Constants::OR.Parameters::GIVEN_NAME );
+           }
         }
 
         if((strpos($options->getScope(), Scope::KYC_HASHED) !== false) && ($options->getVersion() == DefaultOptions::VERSION_DI_2_3)) {
             if (!empty($kycClaims->getNameHashed())) {
-                ValidationUtils::validateParameter($kycClaims->getAddressHashed(), "address_hashed");
+                ValidationUtils::validateParameter($kycClaims->getAddressHashed(), Parameters::ADDRESS_HASHED);
             }
             else if (!empty($options->getKycClaims()->getGivenNameHashed())) {
-                ValidationUtils::validateParameter($kycClaims->getFamilyNameHashed(), "family_name_hashed");
-                ValidationUtils::validateParameter($kycClaims->getHousenoOrHousenameHashed(), "houseno_or_housename_hashed");
-                ValidationUtils::validateParameter($kycClaims->getPostalCodeHashed(), "postal_code_hashed");
-                ValidationUtils::validateParameter($kycClaims->getCountryHashed(), "country_hashed");
-                ValidationUtils::validateParameter($kycClaims->getTownHashed(), "town_hashed");
+                $params = implode(Constants::SPACE, array(
+                    empty($kycClaims->getFamilyNameHashed())? Parameters::FAMILY_NAME_HASHED: null,
+                    empty($kycClaims->getHousenoOrHousenameHashed())? Parameters::HOUSENO_OR_HOUSENAME_HASHED: null,
+                    empty($kycClaims->getPostalCodeHashed())? Parameters::POSTAL_CODE_HASHED: null,
+                    empty($kycClaims->getCountryHashed())? Parameters::COUNTRY_HASHED: null,
+                    empty($kycClaims->getTownHashed())? Parameters::TOWN_HASHED: null));
+                ValidationUtils::validateParameter(null, $params);
             }
             else {
-                ValidationUtils::validateParameter($kycClaims->getNameHashed(), "name_hashed");
-                ValidationUtils::validateParameter($kycClaims->getGivenNameHashed(), "given_name_hashed");
+                ValidationUtils::validateParameter(null, Parameters::NAME_HASHED.Constants::OR.Parameters::GIVEN_NAME_HASHED);
             }
         }
     }

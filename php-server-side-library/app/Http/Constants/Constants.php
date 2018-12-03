@@ -46,6 +46,11 @@ class Constants
     public const REDIRECT_STATUS = "REDIRECT_STATUS";
     public const CONFIG_DIR_NAME = "data";
 
+    public const SPACE = " ";
+    public const OR = " or ";
+
+
+
     public const SECTOR_IDENTIFIER_PATH = "sector_identifier_uri.json";
     public const KYC_CLAIMS_PATH = "kycClaims.json";
     public const DATA_PATH = "data.json";
