@@ -25,21 +25,18 @@
 
 namespace MCSDK\Utils;
 
+use MCSDK\Constants\DefaultOptions;
+use MCSDK\Constants\Header;
 use Zend\Http\Client;
-use Zend\Http\Response;
 use Zend\Http\Headers;
 use Zend\Http\Request;
-use MCSDK\Utils\UriBuilder;
-use MCSDK\Constants\Header;
-use MCSDK\Utils\RestAuthentication;
-use MCSDK\Constants\DefaultOptions;
 
 /**
  * Wrapper for Http requests, returning a simple normalised response object
  */
 class RestClient {
     private $_client;
-    private $_headers;
+    public $_headers;
 
     public function __construct() {
         $this->_client = new Client();
@@ -56,13 +53,14 @@ class RestClient {
      * @param $cookies Cookies to be added to the request (if required)
      * @return RestResponse containing status code, headers and content
      */
-    public function get($uri, $auth = null, $sourceIp = null, $params = null, $xRedirect = null, $version = null, array $cookies = null) {
+    public function get($uri, $auth = null, $sourceIp = null, $clientSideVersion = null, $serverSideVersion = null, $params = null,
+                        $xRedirect = null, array $cookies = null) {
         $builder = new UriBuilder($uri);
         if (!empty($params)) {
             $builder->addQueryParams($params);
         }
 
-        $this->createRequest($auth, Request::METHOD_GET, $builder->getUri(), $sourceIp, $xRedirect, $cookies);
+        $this->createRequest($auth, Request::METHOD_GET, $builder->getUri(), $sourceIp, $xRedirect, null, $clientSideVersion, $serverSideVersion, $cookies);
         $response = $this->_client->send();
         return $this->createRestResponse($response);
     }
@@ -76,14 +74,14 @@ class RestClient {
      * @param $cookies Cookies to be added to the request (if required)
      * @return RestResponse containing status code, headers and content
      */
-    public function post($uri, $auth, $formData, $sourceIp, $xRedirect = null, $version = null, $cookies = null) {
-        $this->createRequest($auth, Request::METHOD_POST, $uri, $sourceIp, $xRedirect, $cookies);
+    public function post($uri, $auth, $formData, $clientSideVersion, $serverSideVersion, $sourceIp,  $xRedirect = null, $cookies = null) {
+        $this->createRequest($auth, Request::METHOD_POST, $uri, $sourceIp, $xRedirect, null, $clientSideVersion, $serverSideVersion,  $cookies);
         $this->_client->setParameterPost($formData);
         $response = $this->_client->send();
         return $this->createRestResponse($response);
     }
 
-    private function createRequest($auth, $method, $uri, $sourceIp, $xRedirect = null, $version = null, array $cookies = null) {
+    private function createRequest($auth, $method, $uri, $sourceIp, $xRedirect = null, $version = null, $clientSideVersion, $serverSideVersion, array $cookies = null) {
         $this->_client->setMethod($method);
         $this->_client->setUri($uri);
         if ($sourceIp !== null) {
@@ -97,6 +95,12 @@ class RestClient {
         }
         if (!empty($auth)) {
             $this->_headers->addHeaderLine(sprintf('Authorization: %s %s', $auth->getScheme(), $auth->getParameter()));
+        }
+        if (!empty($clientSideVersion)) {
+            $this->_headers->addHeaderLine(Header::CLIENT_SIDE_VERSION, $clientSideVersion);
+        }
+        if (!empty($serverSideVersion)) {
+            $this->_headers->addHeaderLine(Header::SERVER_SIDE_VERSION, $serverSideVersion);
         }
         $this->_client->setHeaders($this->_headers);
     }

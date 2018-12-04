@@ -24,14 +24,13 @@
  */
 
 namespace MCSDK\Discovery;
+use MCSDK\Cache\CacheImpl;
+use MCSDK\Cache\ICache;
+use MCSDK\Constants\Parameters;
+use MCSDK\Utils\RestAuthentication;
+use MCSDK\Utils\RestClient;
 use MCSDK\Utils\RestResponse;
 use MCSDK\Utils\ValidationUtils;
-use MCSDK\Utils\RestClient;
-use MCSDK\Constants\Parameters;
-use MCSDK\Discovery\ParsedDiscoveryRedirect;
-use MCSDK\Cache\ICache;
-use MCSDK\Cache\CacheImpl;
-use MCSDK\Utils\RestAuthentication;
 
 /**
  * Concrete implementation of IDiscoveryService
@@ -56,6 +55,7 @@ class DiscoveryService implements IDiscoveryService {
             $options = new DiscoveryOptions();
         }
         $options->setRedirectUrl($redirectUrl);
+
         return $this->callDiscoveryEndpoint($clientId, $clientSecret, $discoveryUrl,
             $options, true, $cookies);
     }
@@ -74,7 +74,9 @@ class DiscoveryService implements IDiscoveryService {
         ValidationUtils::validateParameter($clientId, "clientId");
         ValidationUtils::validateParameter($clientSecret, "clientSecret");
         ValidationUtils::validateParameter($discoveryUrl, "discoveryUrl");
-        ValidationUtils::validateParameter($options->getRedirectUrl(), "redirectUrl");
+        ValidationUtils::validateParameter($options->getClientSideVersion(), "clientSideVersion");
+        ValidationUtils::validateParameter($options->getServerSideVersion(), "serverSideVersion");
+
         if ($cacheDiscoveryResponse) {
             $cachedValue = $this->getCachedValue($options);
             if (!empty($cachedValue)) {
@@ -87,9 +89,12 @@ class DiscoveryService implements IDiscoveryService {
             $response = new RestResponse();
 
             if (empty($options->getMSISDN())) {
-                $response = $this->_client->get($discoveryUrl, $authentication, $options->getClientIp(),$queryParams, $options->getXRedirect(), $cookies);
+                $response = $this->_client->get($discoveryUrl, $authentication, $options->getClientIp(),
+                    $options->getClientSideVersion(), $options->getServerSideVersion(), $queryParams, $options->getXRedirect(), $cookies);
             } else {
-                $response = $this->_client->post($discoveryUrl, $authentication, $queryParams, $options->getClientIp(), $options->getXRedirect(), $cookies);
+                $response = $this->_client->post($discoveryUrl, $authentication, $queryParams,$options->getClientSideVersion(), $options->getServerSideVersion(), $options->getClientIp(),
+                     $options->getXRedirect(), $cookies);
+
             }
 
             $discoveryResponse = new DiscoveryResponse($response);

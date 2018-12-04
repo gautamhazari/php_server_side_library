@@ -159,7 +159,7 @@ class AuthenticationService implements IAuthenticationService {
                 Parameters::GRANT_TYPE => DefaultOptions::GRANT_TYPE
             );
             $authentication = RestAuthentication::Basic($clientId, $clientSecret);
-            $response = $this->_client->post($requestTokenUrl, $authentication, $formData, null, null);
+            $response = $this->_client->post($requestTokenUrl, $authentication, $formData, null, null, null, null, null);
 
             return new RequestTokenResponse($response);
         } catch (Zend\Http\Exception\RuntimeException $ex) {
@@ -309,7 +309,7 @@ class AuthenticationService implements IAuthenticationService {
                 Parameters::GRANT_TYPE => GrantTypes::REFRESH_TOKEN
             );
             $authentication = RestAuthentication::Basic($clientId, $clientSecret);
-            $response = $this->_client->post($refreshTokenUrl, $authentication, $formData, null, null);
+            $response = $this->_client->post($refreshTokenUrl, $authentication, $formData, null, null, null, null, null);
 
             return new RequestTokenResponse($response);
         } catch (Zend\Http\Exception\RuntimeException $ex) {
@@ -335,7 +335,7 @@ class AuthenticationService implements IAuthenticationService {
                 $formData[Parameters::TOKEN_TYPE_HINT] = $tokenTypeHint;
             }
             $authentication = RestAuthentication::Basic($clientId, $clientSecret);
-            $response = $this->_client->post($revokeTokenUrl, $authentication, $formData, null, null);
+            $response = $this->_client->post($revokeTokenUrl, $authentication, $formData, null, null, null, null, null);
             return new RevokeTokenResponse($response);
         } catch (Zend\Http\Exception\RuntimeException $ex) {
             throw new MobileConnectEndpointHttpException($ex->getMessage(), $ex);

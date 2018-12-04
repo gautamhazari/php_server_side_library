@@ -25,8 +25,8 @@
 
 namespace MCSDK;
 
-use MCSDK\Discovery\DiscoveryOptions;
 use MCSDK\Authentication\AuthenticationOptions;
+use MCSDK\Discovery\DiscoveryOptions;
 
 /**
  * Options for a single request to <see cref="MobileConnectInterface"/>.
@@ -36,10 +36,31 @@ use MCSDK\Authentication\AuthenticationOptions;
 class MobileConnectRequestOptions {
     private $_discoveryOptions;
     private $_authOptions;
+    private $_correlationId;
 
     public function __construct() {
         $this->_discoveryOptions = new DiscoveryOptions();
         $this->_authOptions = new AuthenticationOptions();
+    }
+
+    public function getClientSideVersion() {
+        return $this->_discoveryOptions->getClientSideVersion();
+    }
+
+    public function setClientSideVersion($value) {
+        if (!empty($value)) {
+            $this->_discoveryOptions->setClientSideVersion($value);
+        }
+    }
+
+    public function getServerSideVersion() {
+        return $this->_discoveryOptions->getServerSideVersion();
+    }
+
+    public function setServerSideVersion($value) {
+        if (!empty($value)) {
+            $this->_discoveryOptions->setServerSideVersion($value);
+        }
     }
 
     public function getDiscoveryOptions() {
@@ -200,5 +221,21 @@ class MobileConnectRequestOptions {
     public function setClientName($clientName)
     {
         $this->_authOptions->setClientName($clientName);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCorrelationId()
+    {
+        return $this->_correlationId;
+    }
+
+    /**
+     * @param mixed $correlationId
+     */
+    public function setCorrelationId($correlationId): void
+    {
+        $this->_correlationId = $correlationId;
     }
 }

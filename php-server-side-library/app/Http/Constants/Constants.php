@@ -48,6 +48,8 @@ class Constants
     public const DATA_PATH = "data.json";
     public const WD_DATA_PATH = "withoutDiscoveryData.json";
 
+    public const SERVER_SIDE_VERSION = "PHP-3.1.0";
+
     public const IDENTITY_SCOPES = array(Scope::IDENTITY_PHONE, Scope::IDENTITY_SIGNUP,
             Scope::IDENTITY_NATIONALID, Scope::IDENTITY_SIGNUPPLUS, Scope::KYC_HASHED, Scope::KYC_PLAIN);
     public const USERINFO_SCOPES = array(Scope::PROFILE, Scope::EMAIL, Scope::ADDRESS,

@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
+use MCSDK\Constants\Header;
 use MCSDK\Constants\Parameters;
 use MCSDK\Constants\Scope;
 use MCSDK\MobileConnectInterfaceFactory;
@@ -77,6 +78,8 @@ class Controller extends BaseController
         $databaseHelper = new DatabaseHelper();
         $options = new MobileConnectRequestOptions();
         $options->setClientIp($sourceIp);
+        $options->setClientSideVersion($request->header(Header::CLIENT_SIDE_VERSION));
+        $options->setServerSideVersion(Constants::SERVER_SIDE_VERSION);
 
 //TODO: Ask about it ???
 //        $options->getDiscoveryOptions()->setXRedirect(Controller::$_xRedirect);
