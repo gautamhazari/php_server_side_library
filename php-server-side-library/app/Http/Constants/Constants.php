@@ -19,13 +19,6 @@ class Constants
     public const SUB_ID = "subscriber_id";
     public const MCC_MNC = "mcc_mnc";
 
-    public const ERROR = "error";
-    public const ERROR_DESCR = "error_description";
-
-    public const CODE = "code";
-    public const STATE = "state";
-    public const ACCESS_TOKEN = "access_token";
-
     public const CLIENT_ID = "clientID";
     public const CLIENT_SECRET = "clientSecret";
     public const DISCOVERY_URL = "discoveryURL";
@@ -37,6 +30,7 @@ class Constants
     public const SCOPES = "scopes";
     public const CONTEXT = "context";
     public const BIND_MSG = "binding_message";
+    public const RESPONSE_MODE = "response_mode";
     public const AUTH_URL = "authURL";
     public const TOKEN_URL = "tokenURL";
     public const USERINFO_URL = "userInfoURl";
@@ -48,8 +42,6 @@ class Constants
 
     public const SPACE = " ";
     public const OR = " or ";
-
-
 
     public const SECTOR_IDENTIFIER_PATH = "sector_identifier_uri.json";
     public const KYC_CLAIMS_PATH = "kycClaims.json";

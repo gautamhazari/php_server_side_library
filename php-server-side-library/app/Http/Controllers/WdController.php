@@ -5,7 +5,6 @@ require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
 
 use App\Http\Claims\KYCClaimsParameter;
 use App\Http\Config\ConfigWd;
-use App\Http\Constants\Constants;
 use App\Http\DatabaseHelper;
 use App\Http\EndpointUtils;
 use App\Http\HttpUtils;
@@ -17,6 +16,7 @@ use Illuminate\Http\Config;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
+use MCSDK\Constants\Parameters;
 use MCSDK\Constants\Scope;
 use MCSDK\MobileConnectInterfaceFactory;
 use MCSDK\MobileConnectRequestOptions;
@@ -60,7 +60,7 @@ class WdController extends BaseController
     // Route "start_discovery_manually"
     public function startAuthenticationWithoutDiscovery(Request $request)
     {
-        $msisdn = Input::get(Constants::MSISDN);
+        $msisdn = Input::get(strtolower(Parameters::MSISDN));
         $state = WdController::$_mobileConnect->generateUniqueString();
         $nonce = WdController::$_mobileConnect->generateUniqueString();
 
@@ -79,10 +79,10 @@ class WdController extends BaseController
     // Route '/callback_wd'
     public function handleRedirect(Request $request)
     {
-        $code = Input::get(Constants::CODE);
-        $state = Input::get(Constants::STATE);
-        $errorCode = Input::get(Constants::ERROR);
-        $errorDesc = Input::get(Constants::ERROR_DESCR);
+        $code = Input::get(Parameters::CODE);
+        $state = Input::get(Parameters::STATE);
+        $errorCode = Input::get(Parameters::ERROR);
+        $errorDesc = Input::get(Parameters::ERROR_DESCRIPTION);
         $requestUri = $request->getRequestUri();
         if (!empty($code)) {
             $discoveryResponse = WdController::$_databaseHelper->getDiscoveryResponseFromDatabase($state);
@@ -104,7 +104,7 @@ class WdController extends BaseController
     private function startAuth($discoveryResponse, $state, $nonce, $config, $msisdn) {
         $options = McUtils::getMcOptions($config);
         if (!empty($msisdn)) {
-            $loginHint = sprintf("%s:%s", strtoupper(Constants::MSISDN), $msisdn);
+            $loginHint = sprintf("%s:%s", Parameters::MSISDN, $msisdn);
             $options->setLoginHint($loginHint);
         }
         if (strpos($config->getScopes(), Scope::KYC) !== false) {

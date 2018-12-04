@@ -1,14 +1,14 @@
 {
-	"msisdn": "+447700900312",
-	"clientID": "3e217278-4241-468b-ba36-3e2b7d39f92e",
+	"msisdn": "+447700900301",
+	"client_id": "3e217278-4241-468b-ba36-3e2b7d39f92e",
 	"clientSecret": "130757ae-89f9-4591-b0c0-6052ab1c3922",
 	"discoveryURL": "https://discovery.sandbox.mobileconnect.io/v2/discovery",
 	"redirectURL": "http://localhost/php-server-side-library/public/callback",
 	"xRedirect": "False",
 	"includeRequestIP": "True",
-	"scopes":"openid mc_authn",
+	"scope":"openid mc_authz",
 	"apiVersion":"mc_di_r2_v2.3",
-	"clientName":"PhpServerSideDemo",
+	"client_name":"PhpServerSideDemo",
 	"context":"demo",
 	"binding_message":"demo auth"
 }

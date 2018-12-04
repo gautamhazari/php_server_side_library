@@ -11,6 +11,7 @@ namespace App\Http;
 
 use App\Http\Constants\Constants;
 use MCSDK\Constants\DefaultOptions;
+use MCSDK\Constants\Parameters;
 use MCSDK\MobileConnectRequestOptions;
 use MCSDK\Web\ResponseConverter;
 
@@ -19,7 +20,7 @@ class EndpointUtils
     public static function startEndpointRequest($mobileConnect, $config, $discoveryResponse, $authResponse) {
         $status = null;
         $mobileConnectWebResponse = ResponseConverter::Convert($authResponse);
-        $token = $mobileConnectWebResponse->getToken()[Constants::ACCESS_TOKEN];
+        $token = $mobileConnectWebResponse->getToken()[Parameters::ACCESS_TOKEN_HINT];
         $apiVersion = $config->getApiVersion();
         $scopes = $config->getScopes();
 

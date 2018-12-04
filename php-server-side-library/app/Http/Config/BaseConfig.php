@@ -49,14 +49,14 @@ abstract class BaseConfig
     protected $birthdateHashed;
 
     public function getCommonValuesFromJson($json) {
-        $this->client_id =  $json[Constants::CLIENT_ID];
-        $this->clientSecret = $json[Constants::CLIENT_SECRET];
+        $this->client_id =  $json[Parameters::CLIENT_ID];
+        $this->clientSecret = $json[Parameters::CLIENT_SECRET];
         $this->redirectURL = $json[Constants::REDIRECT_URL];
-        $this->apiVersion = $json[Constants::API_VERS];
-        $this->clientName = isset($json[Constants::CLIENT_NAME])?$json[Constants::CLIENT_NAME]: null;
-        $this->scopes = $json[Constants::SCOPES];
-        $this->context = isset($json[Constants::CONTEXT])?$json[Constants::CONTEXT]: null;
-        $this->binding_message = isset($json[Constants::BIND_MSG])?$json[Constants::BIND_MSG]: null;
+        $this->apiVersion = $json[Parameters::API_VERS];
+        $this->clientName = isset($json[Parameters::CLIENT_NAME])?$json[Parameters::CLIENT_NAME]: null;
+        $this->scopes = $json[Parameters::SCOPE];
+        $this->context = isset($json[Parameters::CONTEXT])?$json[Parameters::CONTEXT]: null;
+        $this->binding_message = isset($json[Parameters::BINDING_MESSAGE])?$json[Parameters::BINDING_MESSAGE]: null;
     }
 
     public function getKycValuesFromFile(String $fileName) {

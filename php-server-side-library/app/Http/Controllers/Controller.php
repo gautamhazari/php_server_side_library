@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
+use MCSDK\Constants\Parameters;
 use MCSDK\Constants\Scope;
 use MCSDK\MobileConnectInterfaceFactory;
 use MCSDK\MobileConnectRequestOptions;
@@ -64,10 +65,10 @@ class Controller extends BaseController
 
     // Route "start_discovery"
     public function startDiscovery(Request $request) {
-        $msisdn = Input::get(Constants::MSISDN);
-        $mcc = Input::get(Constants::MCC);
-        $mnc = Input::get(Constants::MNC);
-        $sourceIp = Input::get(Constants::SOURCE_IP);
+        $msisdn = Input::get(strtolower(Parameters::MSISDN));
+        $mcc = Input::get(Parameters::MCC);
+        $mnc = Input::get(Parameters::MNC);
+        $sourceIp = Input::get(Parameters::SOURCE_IP);
         return $this->AttemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request);
     }
 
@@ -92,7 +93,7 @@ class Controller extends BaseController
 
         if ($response->getResponseType() == MobileConnectResponseType::StartAuthentication) {
             McUtils::setCacheByRequest($mcc, $mnc, $sourceIp, $msisdn, $response->getDiscoveryResponse());
-            $authResponse = $this->StartAuth($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()[Constants::SUB_ID], Controller::$_config);
+            $authResponse = $this->StartAuth($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()[Parameters::SUBSCRIBER_ID], Controller::$_config);
             if (McUtils::isErrorInResponse($authResponse)) {
                 return HttpUtils::createResponse($authResponse);
             } else {
@@ -106,9 +107,9 @@ class Controller extends BaseController
 
     // Route ""
     public function handleRedirect(Request $request) {
-        $mcc_mnc = Input::get(Constants::MCC_MNC);
-        $code = Input::get(Constants::CODE);
-        $state = Input::get(Constants::STATE);
+        $mcc_mnc = Input::get(Parameters::MCC_MNC);
+        $code = Input::get(Parameters::CODE);
+        $state = Input::get(Parameters::STATE);
         $databaseHelper =  new DatabaseHelper();
         $requestUri = $request->getRequestUri();
         if(!empty($code)){
@@ -120,7 +121,7 @@ class Controller extends BaseController
 
         } elseif (!empty($mcc_mnc)){
             $response = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, null, $state, null, new MobileConnectRequestOptions());
-            $authResponse = $this->StartAuth($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()[Constants::SUB_ID],
+            $authResponse = $this->StartAuth($response->getSDKSession(), $response->getDiscoveryResponse()->getResponseData()[Parameters::SUBSCRIBER_ID],
                 Controller::$_config);
             if (McUtils::isErrorInResponse($authResponse)) {
                 return HttpUtils::createResponse($authResponse);
@@ -131,8 +132,8 @@ class Controller extends BaseController
             }
         }
         else{
-            $errorCode = Input::get(Constants::ERROR);
-            $errorDesc = Input::get(Constants::ERROR_DESCR);
+            $errorCode = Input::get(Parameters::ERROR);
+            $errorDesc = Input::get(Parameters::ERROR_DESCRIPTION);
             $databaseHelper->clearDiscoveryCacheByState($state);
             return HttpUtils::createResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
         }

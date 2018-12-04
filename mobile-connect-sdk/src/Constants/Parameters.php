@@ -39,12 +39,15 @@ class Parameters
     const USING_MOBILE_DATA = "Using-Mobile-Data";
     const LOCAL_CLIENT_IP = "Local-Client-IP";
     const MSISDN = "MSISDN";
-
+    const MCC = "mcc";
+    const MNC = "mnc";
+    const SOURCE_IP = "sourceIp";
     const MCC_MNC = "mcc_mnc";
     const SUBSCRIBER_ID = "subscriber_id";
 
     //Required params for authentication
     const CLIENT_ID = "client_id";
+    const CLIENT_SECRET = "clientSecret";
     const RESPONSE_TYPE = "response_type";
     const AUTHENTICATION_REDIRECT_URI = "redirect_uri";
     const SCOPE = "scope";
@@ -53,6 +56,10 @@ class Parameters
     const NONCE = "nonce";
     const VERSION = "version";
     const LOGIN_TOKEN_HINT="login_token_hint";
+    const X_REDIRECT = "xRedirect";
+    const INCLUDE_REQ_IP = "includeRequestIP";
+    const API_VERS = "apiVersion";
+    const RESPONSE_MODE = "response_mode";
 
     //Optional params for authentication
     const DISPLAY = "display";
@@ -75,6 +82,7 @@ class Parameters
     const ERROR_DESCRIPTION = "error_description";
     const ERROR_URI = "error_uri";
     const CODE = "code";
+    const CORRELATION_ID = "correlation_id";
 
     //Params for Token
     const GRANT_TYPE = "grant_type";

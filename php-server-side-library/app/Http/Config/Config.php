@@ -10,6 +10,7 @@ namespace App\Http\Config;
 
 use App\Http\ConfigUtils;
 use App\Http\Constants\Constants;
+use MCSDK\Constants\Parameters;
 
 class Config extends BaseConfig
 {
@@ -21,8 +22,8 @@ class Config extends BaseConfig
     }
 
     private function getSpecValuesFromJson($json) {
-        $this->xRedirect = $json[Constants::X_REDIRECT];
-        $this->includeRequestIP = $json[Constants::INCLUDE_REQ_IP];
+        $this->xRedirect = $json[Parameters::X_REDIRECT];
+        $this->includeRequestIP = $json[Parameters::INCLUDE_REQ_IP];
         $this->discoveryURL = $json[Constants::DISCOVERY_URL];
     }
 
