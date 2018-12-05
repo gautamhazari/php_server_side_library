@@ -59,5 +59,20 @@ class Header
      * SDK Version
      */
     const SDK_VERSION = "SDK-Version";
+
+    /**
+     * Key for version Header.
+     */
+    const CLIENT_SIDE_VERSION = "Client-Side-Version";
+
+    /**
+     * Key for version Header.
+     */
+    const SERVER_SIDE_VERSION = "Server-Side-Version";
+
+    /**
+     * Default value for version Header.
+     */
+    const NONE = "none";
 }
 

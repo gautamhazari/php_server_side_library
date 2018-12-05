@@ -25,25 +25,22 @@
 
 namespace MCSDK\Authentication;
 
-use MCSDK\Utils\RestClient;
-use MCSDK\Utils\CurlRestClient;
-use MCSDK\Constants\Scope;
-use MCSDK\Constants\Parameters;
+use App\Http\Constants\Constants;
 use MCSDK\Constants\DefaultOptions;
-use MCSDK\Authentication\IAuthenticationService;
-use MCSDK\Utils\ValidationUtils;
-use MCSDK\Utils\UriBuilder;
-use MCSDK\MobileConnectConstants;
-use MCSDK\Utils\RestAuthentication;
-use MCSDK\Utils\MobileConnectVersions;
-use MCSDK\Utils\Scopes;
+use MCSDK\Constants\GrantTypes;
+use MCSDK\Constants\Parameters;
+use MCSDK\Constants\Scope;
 use MCSDK\Discovery\SupportedVersions;
-use MCSDK\Utils\HttpUtils;
 use MCSDK\Exceptions\MobileConnectEndpointHttpException;
 use MCSDK\Exceptions\OperationCancellationException;
-use MCSDK\Authentication\RevokeTokenResponse;
-use MCSDK\Constants\GrantTypes;
-use PhpParser\Node\Expr\Cast\Object_;
+use MCSDK\MobileConnectConstants;
+use MCSDK\Utils\CurlRestClient;
+use MCSDK\Utils\HttpUtils;
+use MCSDK\Utils\RestAuthentication;
+use MCSDK\Utils\RestClient;
+use MCSDK\Utils\Scopes;
+use MCSDK\Utils\UriBuilder;
+use MCSDK\Utils\ValidationUtils;
 
 /**
  * Concrete implementation of IAuthenticationService
@@ -68,6 +65,8 @@ class AuthenticationService implements IAuthenticationService {
         ValidationUtils::validateParameter($redirectUrl, "redirectUrl");
         ValidationUtils::validateParameter($state, "state");
         ValidationUtils::validateParameter($nonce, "nonce");
+
+        $this->validateKycParams($options);
 
         if (empty($options)) {
             $options = new AuthenticationOptions();
@@ -107,6 +106,45 @@ class AuthenticationService implements IAuthenticationService {
         return $response;
     }
 
+    private function validateKycParams($options) {
+        $kycClaims = $options->getClaims();
+        if((strpos($options->getScope(), Scope::KYC_PLAIN) !== false) && ($options->getVersion() == DefaultOptions::VERSION_DI_2_3)) {
+            if (!empty($kycClaims->getName())) {
+                ValidationUtils::validateParameter($kycClaims->getAddress(), Parameters::ADDRESS);
+            }
+            else if (!empty($kycClaims->getGivenName())) {
+                $params = implode(Constants::SPACE, array(
+                    empty($kycClaims->getFamilyName())? Parameters::FAMILY_NAME: null,
+                    empty($kycClaims->getHousenoOrHousename())? Parameters::HOUSENO_OR_HOUSENAME: null,
+                    empty($kycClaims->getPostalCode())? Parameters::POSTAL_CODE: null,
+                    empty($kycClaims->getCountry())? Parameters::COUNTRY: null,
+                    empty($kycClaims->getTown())? Parameters::TOWN: null));
+                ValidationUtils::validateParameter(null, $params);
+            }
+            else {
+                ValidationUtils::validateParameter(null, Parameters::NAME.Constants::OR.Parameters::GIVEN_NAME );
+           }
+        }
+
+        if((strpos($options->getScope(), Scope::KYC_HASHED) !== false) && ($options->getVersion() == DefaultOptions::VERSION_DI_2_3)) {
+            if (!empty($kycClaims->getNameHashed())) {
+                ValidationUtils::validateParameter($kycClaims->getAddressHashed(), Parameters::ADDRESS_HASHED);
+            }
+            else if (!empty($kycClaims->getGivenNameHashed())) {
+                $params = implode(Constants::SPACE, array(
+                    empty($kycClaims->getFamilyNameHashed())? Parameters::FAMILY_NAME_HASHED: null,
+                    empty($kycClaims->getHousenoOrHousenameHashed())? Parameters::HOUSENO_OR_HOUSENAME_HASHED: null,
+                    empty($kycClaims->getPostalCodeHashed())? Parameters::POSTAL_CODE_HASHED: null,
+                    empty($kycClaims->getCountryHashed())? Parameters::COUNTRY_HASHED: null,
+                    empty($kycClaims->getTownHashed())? Parameters::TOWN_HASHED: null));
+                ValidationUtils::validateParameter(null, $params);
+            }
+            else {
+                ValidationUtils::validateParameter(null, Parameters::NAME_HASHED.Constants::OR.Parameters::GIVEN_NAME_HASHED);
+            }
+        }
+    }
+
     public function RequestToken($clientId, $clientSecret, $requestTokenUrl, $redirectUrl, $code) {
         ValidationUtils::validateParameter($clientId, "clientId");
         ValidationUtils::validateParameter($clientSecret, "clientSecret");
@@ -121,7 +159,7 @@ class AuthenticationService implements IAuthenticationService {
                 Parameters::GRANT_TYPE => DefaultOptions::GRANT_TYPE
             );
             $authentication = RestAuthentication::Basic($clientId, $clientSecret);
-            $response = $this->_client->post($requestTokenUrl, $authentication, $formData, null, null);
+            $response = $this->_client->post($requestTokenUrl, $authentication, $formData, null, null, null, null, null);
 
             return new RequestTokenResponse($response);
         } catch (Zend\Http\Exception\RuntimeException $ex) {
@@ -195,7 +233,8 @@ class AuthenticationService implements IAuthenticationService {
     }
 
     private function getClaimsString($options) {
-        return null;
+        if ($options->getClaims() != null)
+            return $options->getClaims()->toJson();
     }
 
     /**
@@ -270,7 +309,7 @@ class AuthenticationService implements IAuthenticationService {
                 Parameters::GRANT_TYPE => GrantTypes::REFRESH_TOKEN
             );
             $authentication = RestAuthentication::Basic($clientId, $clientSecret);
-            $response = $this->_client->post($refreshTokenUrl, $authentication, $formData, null, null);
+            $response = $this->_client->post($refreshTokenUrl, $authentication, $formData, null, null, null, null, null);
 
             return new RequestTokenResponse($response);
         } catch (Zend\Http\Exception\RuntimeException $ex) {
@@ -296,7 +335,7 @@ class AuthenticationService implements IAuthenticationService {
                 $formData[Parameters::TOKEN_TYPE_HINT] = $tokenTypeHint;
             }
             $authentication = RestAuthentication::Basic($clientId, $clientSecret);
-            $response = $this->_client->post($revokeTokenUrl, $authentication, $formData, null, null);
+            $response = $this->_client->post($revokeTokenUrl, $authentication, $formData, null, null, null, null, null);
             return new RevokeTokenResponse($response);
         } catch (Zend\Http\Exception\RuntimeException $ex) {
             throw new MobileConnectEndpointHttpException($ex->getMessage(), $ex);

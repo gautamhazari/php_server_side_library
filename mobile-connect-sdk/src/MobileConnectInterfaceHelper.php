@@ -24,18 +24,18 @@
  */
 
 namespace MCSDK;
-use MCSDK\Discovery\DiscoveryService;
-use MCSDK\Discovery\DiscoveryResponse;
-use MCSDK\Utils\MobileConnectResponseType;
-use MCSDK\Authentication\IAuthenticationService;
-use MCSDK\Authentication\AuthenticationService;
-use MCSDK\Authentication\StartAuthenticationResponse;
 use MCSDK\Authentication\AuthenticationOptions;
-use MCSDK\Identity\IIdentityService;
-use MCSDK\Discovery\SupportedVersions;
-use MCSDK\Authentication\RequestTokenResponse;
+use MCSDK\Authentication\AuthenticationService;
+use MCSDK\Authentication\IAuthenticationService;
 use MCSDK\Authentication\IJWKeysetService;
+use MCSDK\Authentication\RequestTokenResponse;
+use MCSDK\Authentication\StartAuthenticationResponse;
+use MCSDK\Discovery\DiscoveryResponse;
+use MCSDK\Discovery\DiscoveryService;
+use MCSDK\Discovery\SupportedVersions;
 use MCSDK\Exceptions\OperationCancellationException;
+use MCSDK\Identity\IIdentityService;
+use MCSDK\Utils\MobileConnectResponseType;
 use MCSDK\Utils\ValidationUtils;
 
 /**
@@ -59,7 +59,7 @@ class MobileConnectInterfaceHelper {
             $response = $discovery->StartAutomatedOperatorDiscoveryByPreferences($config, $config->getRedirectUrl(),
                 $discoveryOptions, $cookies);
         } catch (\InvalidArgumentException $e) {
-            return MobileConnectStatus::Error("invalid_argument", "An argument was found to be invalid during the process.", $e);
+            return MobileConnectStatus::Error("invalid_argument", "An argument was found to be invalid during the process.".$e->getMessage(), $e);
         } catch (MCSDK\Exceptions\MobileConnectEndpointHttpException $e) {
             return MobileConnectStatus::Error("http_failure", "An HTTP failure occured while calling the discovery endpoint, the endpoint may be inaccessible", $e);
         } catch (Exception $e) {
@@ -162,9 +162,11 @@ class MobileConnectInterfaceHelper {
         }
 
         $operatorSelectionUrl = $discovery->extractOperatorSelectionUrl($response);
+//----------------------
         if (!empty($operatorSelectionUrl)) {
             return static::operatorSelection($operatorSelectionUrl);
         }
+        //--------------------
         return MobileConnectStatus::StartAuthorization($response);
     }
 

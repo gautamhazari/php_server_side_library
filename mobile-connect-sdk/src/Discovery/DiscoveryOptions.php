@@ -25,6 +25,8 @@
 
 namespace MCSDK\Discovery;
 
+use MCSDK\Constants\Header;
+
 /**
  * Parameters for the IDiscoveryService::StartAutomatedOperatorDiscovery() method.
  * Object can be serialized to JSON to be a POST body
@@ -125,6 +127,16 @@ class DiscoveryOptions
     private $_xRedirect;
 
     /**
+     * The client side version
+     */
+    private $_clientSideVersion;
+
+    /**
+     * The server side version
+     */
+    private $_serverSideVersion;
+
+    /**
      * DiscoveryOptions constructor.
      */
     public function __construct()
@@ -133,6 +145,8 @@ class DiscoveryOptions
         $this->_manuallySelect = static::DEFAULT_MANUALLY_SELECT;
         $this->_cookiesEnabled = static::DEFAULT_COOKIES_ENABLED;
         $this->_xRedirect = static::DEFAULT_X_REDIRECT;
+        $this->_clientSideVersion = Header::NONE;
+        $this->_serverSideVersion = Header::NONE;
     }
 
     public function setSelectedMCC($mcc) {
@@ -363,6 +377,38 @@ class DiscoveryOptions
     public function setClientIP($clientIP)
     {
         $this->_clientIP = $clientIP;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getClientSideVersion()
+    {
+        return $this->_clientSideVersion;
+    }
+
+    /**
+     * @param mixed $clientSideVersion
+     */
+    public function setClientSideVersion($clientSideVersion): void
+    {
+        $this->_clientSideVersion = $clientSideVersion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getServerSideVersion()
+    {
+        return $this->_serverSideVersion;
+    }
+
+    /**
+     * @param mixed $serverSideVersion
+     */
+    public function setServerSideVersion($serverSideVersion): void
+    {
+        $this->_serverSideVersion = $serverSideVersion;
     }
 
 }

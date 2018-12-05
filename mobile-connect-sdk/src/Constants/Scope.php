@@ -30,11 +30,23 @@ class Scope
     const OPENID = "openid";
     const AUTHN = "mc_authn";
     const AUTHZ = "mc_authz";
+    const KYC = "mc_kyc";
 
-    const IDENTITYPHONE = "mc_identity_phonenumber";
-    const IDENTITYSIGNUP = "mc_identity_signup";
-    const IDENTITYSIGNUPPLUS = "mc_identity_signupplus";
-    const IDENTITYNATIONALID = "mc_identity_nationalid";
+    const PROFILE = "profile";
+    const EMAIL = "email";
+    const ADDRESS = "address";
+    const PHONE = "phone";
+    const OFFLINE_ACCESS = "offline_access";
+
+    const IDENTITY_PHONE = "mc_identity_phonenumber";
+    const IDENTITY_SIGNUP = "mc_identity_signup";
+    const IDENTITY_SIGNUPPLUS = "mc_identity_signupplus";
+    const IDENTITY_NATIONALID = "mc_identity_nationalid";
+
+    const KYC_PLAIN = "mc_kyc_plain";
+    const KYC_HASHED = "mc_kyc_hashed";
 
     const MCPREFIX = "mc_";
 }
+
+

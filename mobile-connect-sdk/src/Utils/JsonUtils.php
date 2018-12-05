@@ -25,11 +25,11 @@
 
 namespace MCSDK\Utils;
 
+use MCSDK\Authentication\RequestTokenResponse;
+use MCSDK\Authentication\RequestTokenResponseData;
 use MCSDK\discovery\DiscoveryResponse;
-use MCSDK\oidc\ParsedIdToken;
-use MCSDK\oidc\RequestTokenResponse;
-use MCSDK\oidc\RequestTokenResponseData;
 use MCSDK\helpers\OperatorUrls;
+use MCSDK\oidc\ParsedIdToken;
 use MCSDK\Web\MobileConnectWebResponse;
 
 /**

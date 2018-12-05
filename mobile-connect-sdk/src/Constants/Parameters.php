@@ -39,12 +39,15 @@ class Parameters
     const USING_MOBILE_DATA = "Using-Mobile-Data";
     const LOCAL_CLIENT_IP = "Local-Client-IP";
     const MSISDN = "MSISDN";
-
+    const MCC = "mcc";
+    const MNC = "mnc";
+    const SOURCE_IP = "sourceIp";
     const MCC_MNC = "mcc_mnc";
     const SUBSCRIBER_ID = "subscriber_id";
 
     //Required params for authentication
     const CLIENT_ID = "client_id";
+    const CLIENT_SECRET = "clientSecret";
     const RESPONSE_TYPE = "response_type";
     const AUTHENTICATION_REDIRECT_URI = "redirect_uri";
     const SCOPE = "scope";
@@ -53,6 +56,10 @@ class Parameters
     const NONCE = "nonce";
     const VERSION = "version";
     const LOGIN_TOKEN_HINT="login_token_hint";
+    const X_REDIRECT = "xRedirect";
+    const INCLUDE_REQ_IP = "includeRequestIP";
+    const API_VERS = "apiVersion";
+    const RESPONSE_MODE = "response_mode";
 
     //Optional params for authentication
     const DISPLAY = "display";
@@ -75,6 +82,7 @@ class Parameters
     const ERROR_DESCRIPTION = "error_description";
     const ERROR_URI = "error_uri";
     const CODE = "code";
+    const CORRELATION_ID = "correlation_id";
 
     //Params for Token
     const GRANT_TYPE = "grant_type";
@@ -85,5 +93,32 @@ class Parameters
 
     const ACCESS_TOKEN_HINT = "access_token";
     const REFRESH_TOKEN_HINT = "refresh_token";
+
+    //Params for KYC
+    const VALUE = "value";
+    const  NAME = "name";
+    const  GIVEN_NAME = "given_name";
+    const FAMILY_NAME = "family_name";
+    const ADDRESS = "address";
+    const HOUSENO_OR_HOUSENAME = "houseno_or_housename";
+    const POSTAL_CODE = "postal_code";
+    const TOWN = "town";
+    const COUNTRY = "country";
+    const BIRTHDATE = "birthdate";
+
+    const NAME_HASHED = "name_hashed";
+    const GIVEN_NAME_HASHED = "given_name_hashed";
+    const FAMILY_NAME_HASHED = "family_name_hashed";
+    const ADDRESS_HASHED = "address_hashed";
+    const HOUSENO_OR_HOUSENAME_HASHED = "houseno_or_housename_hashed";
+    const POSTAL_CODE_HASHED = "postal_code_hashed";
+    const TOWN_HASHED = "town_hashed";
+    const COUNTRY_HASHED = "country_hashed";
+    const BIRTHDATE_HASHED = "birthdate_hashed";
+
+    const IS_LOST_STOLEN = "is_lost_stolen";
+    const BILLING_SEGMENT = "billing_segment";
+    const ACCOUNT_STATE = "account_state";
+
 }
 

@@ -6,7 +6,8 @@
     "phpunit/phpunit-mock-objects": "^3.1",
     "phpunit/phpunit": "^5.4",
     "phpunit/php-code-coverage": "^4",
-    "spomky-labs/jose": "^5.2"
+    "spomky-labs/jose": "^5.2",
+    "ext-json": "*"
   },
   "require-dev": {
 

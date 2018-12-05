@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers;
+namespace App\Http;
 
 
 use Faker\Provider\DateTime;
@@ -29,6 +29,10 @@ class DatabaseHelper
     public function clearDiscoveryCache($discoveryResponse){
         $rawDiscoveryResponse = (new FakeDiscoveryOptions())->fromDiscoveryResponse($discoveryResponse)->getJson();
         DB::connection("mysql")->table('discovery_cache')->where('value', '=', $rawDiscoveryResponse)->delete();
+    }
+
+    public function clearDiscoveryCacheByState($state){
+        DB::connection("mysql")->table('discovery')->where('id', '=', $state)->delete();
     }
 
     public function setCachedDiscoveryResponseByMsisdn($msisdn, $discoveryResponse){
