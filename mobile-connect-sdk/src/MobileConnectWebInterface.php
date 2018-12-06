@@ -27,6 +27,8 @@ namespace MCSDK;
 use MCSDK\Authentication\FakeDiscoveryOptions;
 use MCSDK\Authentication\IAuthenticationService;
 use MCSDK\Authentication\IJWKeysetService;
+use MCSDK\Constants\DefaultOptions;
+use MCSDK\Constants\Header;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\IDiscoveryService;
 use MCSDK\Discovery\OperatorUrls;
@@ -80,6 +82,8 @@ class MobileConnectWebInterface
         if  (empty($sourceIp)) {
             $sourceIp = $includeReqIp? $request->header("X-Forwarded-For") : null;
         }
+        $options->setClientSideVersion($request->header(Header::CLIENT_SIDE_VERSION));
+        $options->setServerSideVersion(DefaultOptions::SERVER_SIDE_VERSION);
         $options->setClientIp($sourceIp);
         $cookies = $shouldProxyCookies ? $request->cookie() : null;
         $response = MobileConnectInterfaceHelper::AttemptDiscovery($this->_discovery, $msisdn, $mcc, $mnc, $this->_config, $options, $cookies);

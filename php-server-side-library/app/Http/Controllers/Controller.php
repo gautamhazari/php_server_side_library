@@ -19,8 +19,6 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
-use MCSDK\Constants\DefaultOptions;
-use MCSDK\Constants\Header;
 use MCSDK\Constants\Parameters;
 use MCSDK\MobileConnectInterfaceFactory;
 use MCSDK\MobileConnectRequestOptions;
@@ -65,8 +63,6 @@ class Controller extends BaseController
 
     private function attemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request) {
         $options = new MobileConnectRequestOptions();
-        $options->setClientSideVersion($request->header(Header::CLIENT_SIDE_VERSION));
-        $options->setServerSideVersion(DefaultOptions::SERVER_SIDE_VERSION);
         $response = Controller::$_mobileConnect->AttemptDiscovery($request, $msisdn, $mcc, $mnc, $sourceIp, Controller::$_includeReqIp, true, $options);
 
         if(empty($response->getDiscoveryResponse())){
