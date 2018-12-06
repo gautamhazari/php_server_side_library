@@ -17,7 +17,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
 use MCSDK\Constants\DefaultOptions;
@@ -66,20 +65,17 @@ class Controller extends BaseController
 
     private function attemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request) {
         $options = new MobileConnectRequestOptions();
-        $options->setClientIp($sourceIp);
         $options->setClientSideVersion($request->header(Header::CLIENT_SIDE_VERSION));
         $options->setServerSideVersion(DefaultOptions::SERVER_SIDE_VERSION);
+        $response = Controller::$_mobileConnect->AttemptDiscovery($request, $msisdn, $mcc, $mnc, $sourceIp, Controller::$_includeReqIp, true, $options);
 
-        $response = Controller::$_mobileConnect->AttemptDiscovery($request, $msisdn, $mcc, $mnc, Controller::$_includeReqIp, true, $options);
-
-        if ($response->getDiscoveryResponse() == null || ($_SERVER[Constants::REDIRECT_STATUS] != Response::HTTP_OK)) {
-            if (empty($response->getUrl())) {
-                $response = Controller::$_mobileConnect->AttemptDiscovery($request, null, null, null, Controller::$_includeReqIp, false, $options);
-            }
+        if(empty($response->getDiscoveryResponse())){
+            Controller::$_mobileConnect = MobileConnectInterfaceFactory::buildMobileConnectWebInterfaceWithConfig(Controller::$_config->getMcConfig());
+            $response = Controller::$_mobileConnect->AttemptDiscovery($request, null, null, null, null, false, false, $options);
+        }
             if (!empty($response->getUrl())) {
                 return redirect($response->getUrl());
             }
-        }
 
         if ($response->getResponseType() == MobileConnectResponseType::StartAuthentication) {
             McUtils::setCacheByRequest($mcc, $mnc, $sourceIp, $msisdn, $response->getDiscoveryResponse());

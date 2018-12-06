@@ -13,6 +13,7 @@ use App\Http\Config\MainConfig;
 use MCSDK\MobileConnectStatus;
 use MCSDK\Utils\JsonUtils;
 use MCSDK\Web\ResponseConverter;
+use Symfony\Component\HttpFoundation\Response;
 
 class HttpUtils
 {
@@ -21,7 +22,7 @@ class HttpUtils
         else {
             $json = json_decode(JsonUtils::toJson(ResponseConverter::Convert($status)));
             $clear_json = (object)array_filter((array)$json);
-            return response()->json($clear_json);
+            return response()->json($clear_json, Response::HTTP_FOUND);
         }
     }
 }

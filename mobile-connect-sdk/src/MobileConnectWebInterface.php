@@ -74,11 +74,13 @@ class MobileConnectWebInterface
      * @param MobileConnectRequestOptions $options Optional parameters
      * @return MobileConnectStatus object with required information for continuing the mobileconnect process
      */
-    public function AttemptDiscovery($request, $msisdn, $mcc, $mnc, $includeReqIp, $shouldProxyCookies,
+    public function AttemptDiscovery($request, $msisdn, $mcc, $mnc, $sourceIp, $includeReqIp, $shouldProxyCookies,
         MobileConnectRequestOptions $options) {
 
-        $clientIp = empty($options->getClientIp()) && $includeReqIp? $request->header("X-Forwarded-For") : $options->getClientIp();
-        $options->setClientIp($clientIp);
+        if  (empty($sourceIp)) {
+            $sourceIp = $includeReqIp? $request->header("X-Forwarded-For") : null;
+        }
+        $options->setClientIp($sourceIp);
         $cookies = $shouldProxyCookies ? $request->cookie() : null;
         $response = MobileConnectInterfaceHelper::AttemptDiscovery($this->_discovery, $msisdn, $mcc, $mnc, $this->_config, $options, $cookies);
         return $this->cacheIfRequired($response);
