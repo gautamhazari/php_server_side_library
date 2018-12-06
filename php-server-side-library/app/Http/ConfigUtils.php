@@ -24,4 +24,6 @@ class ConfigUtils
         $string = ConfigUtils::getStringFromFile($fileName);
         return json_decode($string, true);
     }
+
+
 }

@@ -50,4 +50,22 @@ class McUtils
         }
     }
 
+    public static function processAuthResponseResult($authResponse, $discoveryResponse) {
+        $databaseHelper = new DatabaseHelper();
+        if (McUtils::isErrorInResponse($authResponse)) {
+            return HttpUtils::createResponse($authResponse);
+        } else {
+            $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $discoveryResponse);
+            $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
+            return redirect($authResponse->getUrl());
+        }
+    }
+
+    public static function getParamWithName(String $paramName = null, String $paramVal = null)
+    {
+        if (!empty($paramVal) && !empty($paramName)) {
+            return sprintf("%s:%s", $paramName, $paramVal);
+        }
+    }
+
 }

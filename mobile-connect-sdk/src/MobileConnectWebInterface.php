@@ -339,13 +339,13 @@ class MobileConnectWebInterface
      * @param OperatorUrls $_operatorUrls
      * @return MobileConnectStatus
      */
-    public function makeDiscoveryWithoutCall($clientId, $clientSecret, $_operatorUrls, $clientName="Client Name"){
+    public function makeDiscoveryWithoutCall($clientId, $clientSecret, $operatorUrls, $clientName="Client Name"){
 
         $discoveryOptions = new FakeDiscoveryOptions();
         $discoveryOptions->setClientId($clientId);
         $discoveryOptions->setClientSecret($clientSecret);
         $discoveryOptions->setClientName($clientName);
-        $discoveryOptions->setOperatorUrls($_operatorUrls);
+        $discoveryOptions->setOperatorUrls($operatorUrls);
 
         $json = $discoveryOptions->getJson();
 
