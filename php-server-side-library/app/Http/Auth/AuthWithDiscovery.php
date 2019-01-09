@@ -9,6 +9,7 @@
 namespace App\Http\Auth;
 
 
+use App\Http\Claims\KYCClaimsParameter;
 use App\Http\McUtils;
 use MCSDK\Constants\Parameters;
 use MCSDK\Constants\Scope;
@@ -43,8 +44,8 @@ class AuthWithDiscovery
 
     private static function startKYC($mobileConnect, $sdkSession, $subscriberId, $config) {
         $kycClaims = new KYCClaimsParameter();
-        $kycClaims->setName(Controller::$config->getName())
-            ->setAddress(Controller::$config->getAddress());
+        $kycClaims->setName($config->getName())
+            ->setAddress($config->getAddress());
         $options = McUtils::getMcOptions($config);
         $options->setClaims($kycClaims);
         $status = $mobileConnect->StartAuthentication($sdkSession, $subscriberId, null, null, $options);

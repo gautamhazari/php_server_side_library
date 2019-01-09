@@ -7,7 +7,6 @@
 	"xRedirect": "False",
 	"includeRequestIP": "True",
 	"scope":"openid mc_authz",
-	"apiVersion":"mc_di_r2_v2.3",
 	"client_name":"PhpServerSideDemo",
 	"context":"demo",
 	"binding_message":"demo auth"

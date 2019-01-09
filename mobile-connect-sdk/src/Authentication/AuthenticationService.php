@@ -59,7 +59,7 @@ class AuthenticationService implements IAuthenticationService {
     }
 
     public function StartAuthentication($clientId, $authorizeUrl, $redirectUrl, $state, $nonce,
-        $encryptedMSISDN, $versions = null, AuthenticationOptions $options = null) {
+        $encryptedMSISDN, $version, AuthenticationOptions $options = null) {
         ValidationUtils::validateParameter($clientId, "clientId");
         ValidationUtils::validateParameter($authorizeUrl, "authorizeUrl");
         ValidationUtils::validateParameter($redirectUrl, "redirectUrl");
@@ -93,7 +93,6 @@ class AuthenticationService implements IAuthenticationService {
         $options->setRedirectUrl($redirectUrl);
         $options->setClientId($clientId);
 
-        $version = $options->getVersion();
 // We set scope in config. Please use it if you need to set it in automode.
 //        $scope = $this->CoerceAuthenticationScope($options->getScope(), $shouldUseAuthorize, $version, $versions);
 //        $options->setScope($scope);

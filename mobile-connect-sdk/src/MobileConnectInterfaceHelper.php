@@ -29,10 +29,11 @@ use MCSDK\Authentication\AuthenticationService;
 use MCSDK\Authentication\IAuthenticationService;
 use MCSDK\Authentication\IJWKeysetService;
 use MCSDK\Authentication\RequestTokenResponse;
-use MCSDK\Authentication\StartAuthenticationResponse;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\DiscoveryService;
 use MCSDK\Discovery\SupportedVersions;
+use MCSDK\Discovery\VersionDetection;
+use MCSDK\Exceptions\InvalidScopeException;
 use MCSDK\Exceptions\OperationCancellationException;
 use MCSDK\Identity\IIdentityService;
 use MCSDK\Utils\MobileConnectResponseType;
@@ -70,27 +71,24 @@ class MobileConnectInterfaceHelper {
     }
 
     public static function StartAuthentication(IAuthenticationService $authentication, DiscoveryResponse $discoveryResponse,
-        $encryptedMSISDN, $state, $nonce, MobileConnectConfig $config, MobileConnectRequestOptions $options) {
-        $response = new StartAuthenticationResponse();
+        $encryptedMSISDN, $state, $nonce, MobileConnectConfig $config, MobileConnectRequestOptions $options)
+    {
         try {
             $clientId = $discoveryResponse->getResponseData()['response']['client_id'];
             $authorizationUrl = $discoveryResponse->getOperatorUrls()->getAuthorizationUrl();
-            if (isset($discoveryResponse->getProviderMetadata()['mobile_connect_version_supported'])) {
-                $supportedVersions = new SupportedVersions($discoveryResponse->getProviderMetadata()['mobile_connect_version_supported']);
-            } else {
-                $supportedVersions = new SupportedVersions(null);
-            }
-
             $authOptions = empty($options) ? new AuthenticationOptions() : $options->getAuthenticationOptions();
+            $version = VersionDetection::getCurrentVersion($authOptions->getVersion(), $authOptions->getScope(), $discoveryResponse->getProviderMetadata());
 
             $response = $authentication->StartAuthentication($clientId, $authorizationUrl, $config->getRedirectUrl(),
-                $state, $nonce, $encryptedMSISDN, $supportedVersions, $authOptions);
+                $state, $nonce, $encryptedMSISDN, $version, $authOptions);
         } catch (\InvalidArgumentException $e) {
             return MobileConnectStatus::Error("invalid_argument", "An argument was found to be invalid during the process. " . $e->getMessage(), $e);
         } catch (MCSDK\Exceptions\MobileConnectEndpointHttpException $e) {
             return MobileConnectStatus::Error("http_failure", "An HTTP failure occured while calling the discovery endpoint, the endpoint may be inaccessible", $e);
         } catch (Exception $e) {
             return MobileConnectStatus::Error("unknown_error", "An unknown error occured while calling the Discovery service to obtain operator details", $e);
+        } catch (InvalidScopeException $e) {
+            return MobileConnectStatus::Error("invalid_scope", $e->getMessage());
         }
         return MobileConnectStatus::Authorization($response->getUrl(), $state, $nonce);
     }

@@ -39,7 +39,7 @@ class DefaultOptions
     const MIN_TTL_MS = 300000;
     const MAX_TTL_MS = 15552000000;
 
-    const AUTHENTICATION_ACR_VALUES = "2 3";
+    const AUTHENTICATION_ACR_VALUES = "2";
     const AUTHENTICATION_SCOPE = Scope::OPENID;
     const AUTHENTICATION_MAX_AGE = 3600;
     const AUTHENTICATION_RESPONSE_TYPE = "code";

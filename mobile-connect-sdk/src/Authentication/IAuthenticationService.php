@@ -43,7 +43,7 @@ interface IAuthenticationService
      * @param AuthenticationOptions options Optional parameters
      */
     public function StartAuthentication($clientId, $authorizeUrl, $redirectUrl, $state, $nonce,
-        $encryptedMSISDN, $versions = null, AuthenticationOptions $options = null);
+        $encryptedMSISDN, $version, AuthenticationOptions $options = null);
 
     /**
      * Allows an application to use the authorization code obtained from authentication/authorization to obtain an access token
