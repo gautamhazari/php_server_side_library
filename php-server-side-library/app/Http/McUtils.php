@@ -11,12 +11,14 @@ namespace App\Http;
 
 use App\Http\Config\BaseConfig;
 use MCSDK\Constants\DefaultOptions;
+use MCSDK\Discovery\DiscoveryResponse;
+use MCSDK\Discovery\VersionDetection;
 use MCSDK\MobileConnectRequestOptions;
 
 class McUtils
 {
-    public static function getMcOptions(BaseConfig $config) {
-        $apiVersion = $config->getApiVersion();
+    public static function getMcOptions(BaseConfig $config, DiscoveryResponse $discoveryResponse) {
+        $apiVersion = VersionDetection::getCurrentVersion($config->getApiVersion(), $config->getScopes(), $discoveryResponse->getProviderMetadata());
         $scopes = $config->getScopes();
         $clientName = $config->getClientName();
         $context = $config->getContext();

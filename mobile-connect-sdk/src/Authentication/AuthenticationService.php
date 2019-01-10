@@ -269,7 +269,7 @@ class AuthenticationService implements IAuthenticationService {
     }
 
     public function RequestHeadlessAuthentication($clientId, $clientSecret, $authorizeUrl, $tokenUrl, $redirectUrl,
-        $state, $nonce, $encryptedMSISDN, SupportedVersions $versions = null, AuthenticationOptions $options = null, $cancel = false) {
+        $state, $nonce, $encryptedMSISDN, $version, AuthenticationOptions $options = null, $cancel = false) {
 
         $options = empty($options) ? new AuthenticationOptions() : $options;
         $shouldUseAuthorize = $this->shouldUseAuthorize($options);
@@ -279,7 +279,7 @@ class AuthenticationService implements IAuthenticationService {
         }
 
         $authUrl = $this->StartAuthentication($clientId, $authorizeUrl, $redirectUrl, $state, $nonce, $encryptedMSISDN,
-            $versions, $options)->getUrl();
+            $version, $options)->getUrl();
 
         $curlRestClient = new CurlRestClient();
         try {

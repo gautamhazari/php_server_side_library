@@ -16,35 +16,32 @@ use MCSDK\Constants\Scope;
 class AuthWithoutDiscovery
 {
     public static function startAuth($mobileConnect, $response, $config, $msisdn) {
-
+        $options = McUtils::getMcOptions($config, $response);
         if (strpos($config->getScopes(), Scope::KYC) !== false) {
-            $status = AuthWithoutDiscovery::startKYC($mobileConnect, $response, $msisdn, $config);
+            $status = AuthWithoutDiscovery::startKYC($mobileConnect, $response, $msisdn, $options);
         } else if (strpos($config->getScopes(), Scope::AUTHZ) !== false) {
-            $status = AuthWithoutDiscovery::startAuthorisation($mobileConnect, $response, $msisdn, $config);
+            $status = AuthWithoutDiscovery::startAuthorisation($mobileConnect, $response, $msisdn, $options);
         } else {
-            $status = AuthWithoutDiscovery::startAuthentication($mobileConnect, $response, $msisdn, $config);
+            $status = AuthWithoutDiscovery::startAuthentication($mobileConnect, $response, $msisdn, $options, $config);
         }
 
         return McUtils::processAuthResponseResult($status, $response);
     }
 
-    private static function startAuthentication($mobileConnect, $discoveryResponse, $msisdn, $config) {
-        $options = McUtils::getMcOptions($config);
+    private static function startAuthentication($mobileConnect, $discoveryResponse, $msisdn, $options) {
         $options->setLoginHint(McUtils::getParamWithName(Parameters::MSISDN, $msisdn));
         return $mobileConnect->Authentication($discoveryResponse, null, null, null, $options);
     }
 
-    private static function startAuthorisation($mobileConnect, $discoveryResponse, $msisdn, $config) {
-        $options = McUtils::getMcOptions($config);
+    private static function startAuthorisation($mobileConnect, $discoveryResponse, $msisdn, $options) {
         $options->setLoginHint(McUtils::getParamWithName(Parameters::MSISDN, $msisdn));
         return $mobileConnect->Authentication($discoveryResponse, null, null, null, $options);
     }
 
-    private static function startKYC($mobileConnect, $discoveryResponse, $msisdn, $config) {
+    private static function startKYC($mobileConnect, $discoveryResponse, $msisdn, $options, $config) {
         $kycClaims = new KYCClaimsParameter();
         $kycClaims->setName($config->getName())
             ->setAddress($config->getAddress());
-        $options = McUtils::getMcOptions($config);
         $options->setLoginHint(McUtils::getParamWithName(Parameters::MSISDN, $msisdn));
         $options->setClaims($kycClaims);
         $status = $mobileConnect->Authentication($discoveryResponse, null, null, null, $options);

@@ -62,12 +62,10 @@ class Controller extends BaseController
     }
 
     private function attemptDiscoveryWrapper($msisdn, $mcc, $mnc, $sourceIp, $request) {
-        $options = new MobileConnectRequestOptions();
-        $response = Controller::$_mobileConnect->AttemptDiscovery($request, $msisdn, $mcc, $mnc, $sourceIp, Controller::$_includeReqIp, true, $options);
-
+        $response = Controller::$_mobileConnect->AttemptDiscovery($request, $msisdn, $mcc, $mnc, $sourceIp, Controller::$_includeReqIp, true, new MobileConnectRequestOptions());
         if(empty($response->getDiscoveryResponse())){
             Controller::$_mobileConnect = MobileConnectInterfaceFactory::buildMobileConnectWebInterfaceWithConfig(Controller::$_config->getMcConfig());
-            $response = Controller::$_mobileConnect->AttemptDiscovery($request, null, null, null, null, false, false, $options);
+            $response = Controller::$_mobileConnect->AttemptDiscovery($request, null, null, null, null, false, false, new MobileConnectRequestOptions());
         }
             if (!empty($response->getUrl())) {
                 return redirect($response->getUrl());
@@ -91,6 +89,7 @@ class Controller extends BaseController
             $nonce = Controller::$_databaseHelper->getNonceFromDatabase($state);
             $authStatus = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, $discoveryResponse, $state, $nonce, new MobileConnectRequestOptions());
             $endPointStatus = EndpointUtils::startEndpointRequest(Controller::$_mobileConnect, Controller::$_config, $discoveryResponse, $authStatus);
+            Controller::$_databaseHelper->clearDiscoveryCacheByState($state);
             return HttpUtils::createResponse(!empty($endPointStatus) ? $endPointStatus:$authStatus);
 
         } elseif (!empty($mcc_mnc)){

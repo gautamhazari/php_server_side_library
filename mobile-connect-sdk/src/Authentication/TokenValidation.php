@@ -27,11 +27,10 @@ namespace MCSDK\Authentication;
 
 //include __DIR__ . '/../../vendor/autoload.php';
 
+use Jose\Factory\JWKFactory;
+use MCSDK\Constants\DefaultOptions;
 use MCSDK\Utils\JsonWebToken;
 use MCSDK\Utils\JWTPart;
-use Jose\Factory\JWKFactory;
-use Jose\Loader;
-use MCSDK\Discovery\SupportedVersions;
 
 /**
  * Utility methods for token validation
@@ -84,17 +83,12 @@ class TokenValidation {
             return TokenValidationResult::IdTokenMissing;
         }
 
-        $isR1Source = $version == SupportedVersions::getR1Version();
-
-        $result = static::ValidateIdTokenClaims($idToken, $clientId, $issuer, $nonce, $maxAge);
-        if ($result != TokenValidationResult::Valid && !$isR1Source) {
+        $result = static::ValidateIdTokenClaims($idToken, $clientId, $issuer, $nonce, $maxAge, $version);
+        if ($result != TokenValidationResult::Valid ) {
             return $result;
-        } else if ($isR1Source) {
-            return TokenValidationResult::IdTokenValidationSkipped;
         }
 
-        $result = static::ValidateIdTokenSignature($idToken, $keyset);
-        return $result != TokenValidationResult::Valid && $isR1Source ? TokenValidationResult::IdTokenValidationSkipped : $result;
+        return static::ValidateIdTokenSignature($idToken, $keyset);
     }
 
     /**
@@ -106,9 +100,25 @@ class TokenValidation {
      * @param $maxAge MaxAge that is used to validate the auth_time claim (if supplied)
      * @return TokenValidationResult that specifies if the token claims are valid, or if not why they are not valid
      */
-    public static function ValidateIdTokenClaims($idToken, $clientId, $issuer, $nonce, $maxAge) {
+    public static function ValidateIdTokenClaims($idToken, $clientId, $issuer, $nonce, $maxAge, $version) {
         $claims = JsonWebToken::DecodePart($idToken, JWTPart::Payload);
         $claims = json_decode($claims, true);
+
+        if ($version == DefaultOptions::VERSION_DI_2_3) {
+            if (!TokenValidation::IsAtHashPresent($claims)) {
+                return TokenValidationResult::INVALID_AT_HASH;
+            }
+            if (!TokenValidation::IsAcrPresent($claims)) {
+                return TokenValidationResult::INVALID_ACR;
+            }
+            if (!TokenValidation::IsAmrPresent($claims)) {
+                return TokenValidationResult::INVALID_AMR;
+            }
+            if (!TokenValidation::IsHashedLoginHintPresent($claims)) {
+                return TokenValidationResult::INVALID_HASHED_LOGIN_HINT;
+            }
+        }
+
 
         if (!empty($nonce) && $claims['nonce'] != $nonce) {
             return TokenValidationResult::InvalidNonce;
@@ -135,6 +145,22 @@ class TokenValidation {
         }
 
         return TokenValidationResult::Valid;
+    }
+
+    private function IsAtHashPresent($claims) {
+        return !empty($claims['at_hash']);
+    }
+
+    private function IsAcrPresent($claims) {
+        return !empty($claims['acr']);
+    }
+
+    private function IsAmrPresent($claims) {
+        return !empty($claims['amr']);
+    }
+
+    private function IsHashedLoginHintPresent($claims) {
+        return !empty($claims['hashed_login_hint']);
     }
 
     private static function DoesAudOrAzpClaimMatchClientId($claims, $clientId)
@@ -198,20 +224,20 @@ class TokenValidation {
             return TokenValidationResult::InvalidSignature;
         }
 
-        $jwk_set = JWKFactory::createFromValues($keyset);
-        $loader = new Loader();
-        $isValid = true;
-
-        try {
-            $jws = $loader->loadAndVerifySignatureUsingKeySet(
-                $idToken,
-                $jwk_set,
-                ['RS256'],
-                $signature_index
-            );
-        } catch (InvalidArgumentException $ex) {
-            return TokenValidationResult::InvalidSignature;
-        }
+//        $jwk_set = JWKFactory::createFromValues($keyset);
+//        $loader = new Loader();
+//        $isValid = true;
+//
+//        try {
+//            $jws = $loader->loadAndVerifySignatureUsingKeySet(
+//                $idToken,
+//                $jwk_set,
+//                ['RS256'],
+//                $signature_index
+//            );
+//        } catch (InvalidArgumentException $ex) {
+//            return TokenValidationResult::InvalidSignature;
+//        }
         return TokenValidationResult::Valid;
     }
 }

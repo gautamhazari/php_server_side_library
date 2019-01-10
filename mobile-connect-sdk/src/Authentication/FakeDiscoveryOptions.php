@@ -13,6 +13,7 @@ class FakeDiscoveryOptions
     private $_clientSecret;
     private $_clientName;
     private $_subId;
+    private $_providerMetadata;
 
     public function __construct()
     {
@@ -90,7 +91,25 @@ class FakeDiscoveryOptions
         $this->_subId = $subId;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getProviderMetadata()
+    {
+        return $this->_providerMetadata;
+    }
+
+    /**
+     * @param mixed $providerMetadata
+     */
+    public function setProviderMetadata($providerMetadata): void
+    {
+        $this->_providerMetadata = $providerMetadata;
+    }
+
+
     public function fromDiscoveryResponse(DiscoveryResponse $discoveryResponse){
+        $this->setProviderMetadata($discoveryResponse->getProviderMetadata());
         $this->_operatorUrls = $discoveryResponse->getOperatorUrls();
         $this->setSubId($discoveryResponse->getResponseData()['subscriber_id']);
         $this->setClientId($discoveryResponse->getResponseData()['response']['client_id']);
@@ -107,11 +126,14 @@ class FakeDiscoveryOptions
 			    }
 		    },
 		    \"client_secret\": \"%s\",
-		    \"client_id\": \"%s\"
+		    \"client_id\": \"%s\",
+		    \"provider_metadata\": %s
 	        },
 	    \"subscriber_id\": \"%s\"
         }";
 
-        return sprintf($json, $this->_operatorUrls->getJson(), $this->_clientSecret, $this->_clientId, $this->_clientName, $this->_subId);
+        return sprintf($json, $this->_operatorUrls->getJson(), $this->_clientSecret, $this->_clientId, json_encode($this->_providerMetadata), $this->_subId);
     }
+
+
 }

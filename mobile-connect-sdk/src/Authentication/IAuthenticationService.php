@@ -72,7 +72,7 @@ interface IAuthenticationService
      * @return Token if headless authentication is successful
      */
     public function RequestHeadlessAuthentication($clientId, $clientSecret, $authorizeUrl, $tokenUrl, $redirectUrl,
-        $state, $nonce, $encryptedMSISDN, SupportedVersions $versions = null, AuthenticationOptions $options = null);
+        $state, $nonce, $encryptedMSISDN, $version, AuthenticationOptions $options = null);
 
     /**
      * Allows an application to use the refresh token obtained from request token response and request for a token refresh.

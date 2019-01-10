@@ -31,7 +31,6 @@ use MCSDK\Authentication\IJWKeysetService;
 use MCSDK\Authentication\RequestTokenResponse;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\DiscoveryService;
-use MCSDK\Discovery\SupportedVersions;
 use MCSDK\Discovery\VersionDetection;
 use MCSDK\Exceptions\InvalidScopeException;
 use MCSDK\Exceptions\OperationCancellationException;
@@ -78,7 +77,6 @@ class MobileConnectInterfaceHelper {
             $authorizationUrl = $discoveryResponse->getOperatorUrls()->getAuthorizationUrl();
             $authOptions = empty($options) ? new AuthenticationOptions() : $options->getAuthenticationOptions();
             $version = VersionDetection::getCurrentVersion($authOptions->getVersion(), $authOptions->getScope(), $discoveryResponse->getProviderMetadata());
-
             $response = $authentication->StartAuthentication($clientId, $authorizationUrl, $config->getRedirectUrl(),
                 $state, $nonce, $encryptedMSISDN, $version, $authOptions);
         } catch (\InvalidArgumentException $e) {
@@ -108,12 +106,12 @@ class MobileConnectInterfaceHelper {
             $tokenUrl = $discoveryResponse->getOperatorUrls()->getRequestTokenUrl();
             $issuer = $discoveryResponse->getProviderMetadata()['issuer'];
 
-            $supportedVersions = new SupportedVersions($discoveryResponse->getProviderMetadata()['mobile_connect_version_supported']);
             $authOptions = empty($options) ? new AuthenticationOptions() : $options->getAuthenticationOptions();
             $authOptions->setClientName($discoveryResponse->getApplicationShortName());
+            $version = VersionDetection::getCurrentVersion($authOptions->getVersion(), $authOptions->getScope(), $discoveryResponse->getProviderMetadata());
 
             $response = $authentication->RequestHeadlessAuthentication($clientId, $clientSecret, $authorizationUrl,
-                $tokenUrl, $config->getRedirectUrl(), $state, $nonce, $encryptedMSISDN, $supportedVersions, $authOptions, $cancel);
+                $tokenUrl, $config->getRedirectUrl(), $state, $nonce, $encryptedMSISDN, $version, $authOptions, $cancel);
 
             $jwKeySet = $jwks->RetrieveJWKS($discoveryResponse->getOperatorUrls()->getJWKSUrl());
 
@@ -238,13 +236,12 @@ class MobileConnectInterfaceHelper {
 
             $response = $authentication->RequestToken($clientId, $clientSecret, $requestTokenUrl, $config->getRedirectUrl(), $code);
             $jwKeySet = $jwks->RetrieveJWKS($discoveryResponse->getOperatorUrls()->getJWKSUrl());
-            if (isset($discoveryResponse->getProviderMetadata()['mobile_connect_version_supported'])) {
-                $supportedVersions = new SupportedVersions($discoveryResponse->getProviderMetadata()['mobile_connect_version_supported']);
-            } else {
-                $supportedVersions = new SupportedVersions(null);
-            }
+
+            $authOptions = empty($options) ? new AuthenticationOptions() : $options->getAuthenticationOptions();
+            $version = VersionDetection::getCurrentVersion($authOptions->getVersion(), $authOptions->getScope(), $discoveryResponse->getProviderMetadata());
+
             return static::HandleTokenResponse($authentication, $response, $clientId, $issuer, $expectedNonce, $jwKeySet,
-                $supportedVersions->getMaxSupportedVersion(), $options);
+                $version, $options);
 
         } catch(Exception $ex) {
             return MobileConnectStatus::Error("unknown_error", "A failure occured while requesting a token", $ex);

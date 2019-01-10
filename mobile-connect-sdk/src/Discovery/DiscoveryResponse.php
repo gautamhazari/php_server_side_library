@@ -25,11 +25,10 @@
 
 namespace MCSDK\Discovery;
 
-use Zend\Http\Headers;
-use MCSDK\Utils\RestResponse;
-use MCSDK\Constants\LinkRels;
-use MCSDK\Exceptions\MobileConnectProviderMetadataUnavailableException;
 use MCSDK\Constants\DefaultOptions;
+use MCSDK\Exceptions\MobileConnectProviderMetadataUnavailableException;
+use MCSDK\Utils\RestResponse;
+use Zend\Http\Headers;
 
 /**
  * Class to hold a Discovery Response.
@@ -102,6 +101,10 @@ class DiscoveryResponse
                 "error" => $responseData["error"],
                 "error_description" => $responseData["description"]
             );
+        }
+
+        if (isset($responseData["response"]["provider_metadata"])) {
+            $this->_providerMetadata = $responseData["response"]["provider_metadata"];
         }
 
     }

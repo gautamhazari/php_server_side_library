@@ -47,7 +47,7 @@ class SupportedVersions
             MobileConnectConstants::MOBILECONNECTIDENTITYSIGNUP,
             MobileConnectConstants::MOBILECONNECTIDENTITYSIGNUPPLUS
         );
-        $this->_maxSupportedVersion = $this->IdentifyMaxSupportedVersion($this->_initialValuesDict);
+//        $this->_maxSupportedVersion = $this->IdentifyMaxSupportedVersion($this->_initialValuesDict);
     }
 
     public function getMaxSupportedVersion() {
@@ -126,4 +126,4 @@ class SupportedVersions
     }
 }
 
-SupportedVersions::setR1Version();
+
