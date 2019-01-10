@@ -52,7 +52,7 @@ abstract class BaseConfig
         $this->client_id =  $json[Parameters::CLIENT_ID];
         $this->clientSecret = $json[Parameters::CLIENT_SECRET];
         $this->redirectURL = $json[Constants::REDIRECT_URL];
-        $this->apiVersion = $json[Parameters::API_VERS];
+        $this->apiVersion = isset($json[Parameters::API_VERS])?$json[Parameters::API_VERS]: null;
         $this->clientName = isset($json[Parameters::CLIENT_NAME])?$json[Parameters::CLIENT_NAME]: null;
         $this->scopes = $json[Parameters::SCOPE];
         $this->context = isset($json[Parameters::CONTEXT])?$json[Parameters::CONTEXT]: null;

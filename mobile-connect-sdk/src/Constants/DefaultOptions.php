@@ -55,11 +55,12 @@ class DefaultOptions
     const VERSION_MOBILECONNECTAUTHZ = "mc_v1.1";
     const VERSION_MOBILECONNECTIDENTITY = "mc_v1.1";
 
-    public const VERSION_1_1 = "mc_v1.1";
-    public const VERSION_2_0 = "mc_v2.0";
-    public const VERSION_DI_2_3 = "mc_di_r2_v2.3";
-    public const VERSION_SI_1_0 = "mc_si_r2_v1.0";
+    const VERSION_1_1 = "mc_v1.1";
+    const VERSION_2_0 = "mc_v2.0";
+    const VERSION_DI_2_3 = "mc_di_r2_v2.3";
+    const VERSION_SI_1_0 = "mc_si_r2_v1.0";
 
-    const SDK_VERSION = "PHP-2.2.1";
+    const SDK_VERSION = "";
+    const SERVER_SIDE_VERSION = "PHP-3.1.0";
 }
 

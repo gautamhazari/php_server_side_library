@@ -11,12 +11,14 @@ namespace App\Http;
 
 use App\Http\Config\BaseConfig;
 use MCSDK\Constants\DefaultOptions;
+use MCSDK\Discovery\DiscoveryResponse;
+use MCSDK\Discovery\VersionDetection;
 use MCSDK\MobileConnectRequestOptions;
 
 class McUtils
 {
-    public static function getMcOptions(BaseConfig $config) {
-        $apiVersion = $config->getApiVersion();
+    public static function getMcOptions(BaseConfig $config, DiscoveryResponse $discoveryResponse) {
+        $apiVersion = VersionDetection::getCurrentVersion($config->getApiVersion(), $config->getScopes(), $discoveryResponse->getProviderMetadata());
         $scopes = $config->getScopes();
         $clientName = $config->getClientName();
         $context = $config->getContext();
@@ -47,6 +49,24 @@ class McUtils
             if (!empty($ip)) {
                 $databaseHelper->setCachedDiscoveryResponseByIp($ip, $discoveryResponse);
             }
+        }
+    }
+
+    public static function processAuthResponseResult($authResponse, $discoveryResponse) {
+        $databaseHelper = new DatabaseHelper();
+        if (McUtils::isErrorInResponse($authResponse)) {
+            return HttpUtils::createResponse($authResponse);
+        } else {
+            $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $discoveryResponse);
+            $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
+            return redirect($authResponse->getUrl());
+        }
+    }
+
+    public static function getParamWithName(String $paramName = null, String $paramVal = null)
+    {
+        if (!empty($paramVal) && !empty($paramName)) {
+            return sprintf("%s:%s", $paramName, $paramVal);
         }
     }
 

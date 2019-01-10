@@ -59,7 +59,7 @@ class AuthenticationService implements IAuthenticationService {
     }
 
     public function StartAuthentication($clientId, $authorizeUrl, $redirectUrl, $state, $nonce,
-        $encryptedMSISDN, $versions = null, AuthenticationOptions $options = null) {
+        $encryptedMSISDN, $version, AuthenticationOptions $options = null) {
         ValidationUtils::validateParameter($clientId, "clientId");
         ValidationUtils::validateParameter($authorizeUrl, "authorizeUrl");
         ValidationUtils::validateParameter($redirectUrl, "redirectUrl");
@@ -93,7 +93,6 @@ class AuthenticationService implements IAuthenticationService {
         $options->setRedirectUrl($redirectUrl);
         $options->setClientId($clientId);
 
-        $version = $options->getVersion();
 // We set scope in config. Please use it if you need to set it in automode.
 //        $scope = $this->CoerceAuthenticationScope($options->getScope(), $shouldUseAuthorize, $version, $versions);
 //        $options->setScope($scope);
@@ -270,7 +269,7 @@ class AuthenticationService implements IAuthenticationService {
     }
 
     public function RequestHeadlessAuthentication($clientId, $clientSecret, $authorizeUrl, $tokenUrl, $redirectUrl,
-        $state, $nonce, $encryptedMSISDN, SupportedVersions $versions = null, AuthenticationOptions $options = null, $cancel = false) {
+        $state, $nonce, $encryptedMSISDN, $version, AuthenticationOptions $options = null, $cancel = false) {
 
         $options = empty($options) ? new AuthenticationOptions() : $options;
         $shouldUseAuthorize = $this->shouldUseAuthorize($options);
@@ -280,7 +279,7 @@ class AuthenticationService implements IAuthenticationService {
         }
 
         $authUrl = $this->StartAuthentication($clientId, $authorizeUrl, $redirectUrl, $state, $nonce, $encryptedMSISDN,
-            $versions, $options)->getUrl();
+            $version, $options)->getUrl();
 
         $curlRestClient = new CurlRestClient();
         try {

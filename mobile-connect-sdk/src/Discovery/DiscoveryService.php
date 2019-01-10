@@ -55,7 +55,6 @@ class DiscoveryService implements IDiscoveryService {
             $options = new DiscoveryOptions();
         }
         $options->setRedirectUrl($redirectUrl);
-
         return $this->callDiscoveryEndpoint($clientId, $clientSecret, $discoveryUrl,
             $options, true, $cookies);
     }

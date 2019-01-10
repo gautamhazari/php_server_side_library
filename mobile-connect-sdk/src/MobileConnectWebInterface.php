@@ -27,6 +27,8 @@ namespace MCSDK;
 use MCSDK\Authentication\FakeDiscoveryOptions;
 use MCSDK\Authentication\IAuthenticationService;
 use MCSDK\Authentication\IJWKeysetService;
+use MCSDK\Constants\DefaultOptions;
+use MCSDK\Constants\Header;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\IDiscoveryService;
 use MCSDK\Discovery\OperatorUrls;
@@ -74,11 +76,15 @@ class MobileConnectWebInterface
      * @param MobileConnectRequestOptions $options Optional parameters
      * @return MobileConnectStatus object with required information for continuing the mobileconnect process
      */
-    public function AttemptDiscovery($request, $msisdn, $mcc, $mnc, $includeReqIp, $shouldProxyCookies,
+    public function AttemptDiscovery($request, $msisdn, $mcc, $mnc, $sourceIp, $includeReqIp, $shouldProxyCookies,
         MobileConnectRequestOptions $options) {
 
-        $clientIp = empty($options->getClientIp()) && $includeReqIp? $request->header("X-Forwarded-For") : $options->getClientIp();
-        $options->setClientIp($clientIp);
+        if  (empty($sourceIp)) {
+            $sourceIp = $includeReqIp? $request->header("X-Forwarded-For") : null;
+        }
+        $options->setClientSideVersion($request->header(Header::CLIENT_SIDE_VERSION));
+        $options->setServerSideVersion(DefaultOptions::SERVER_SIDE_VERSION);
+        $options->setClientIp($sourceIp);
         $cookies = $shouldProxyCookies ? $request->cookie() : null;
         $response = MobileConnectInterfaceHelper::AttemptDiscovery($this->_discovery, $msisdn, $mcc, $mnc, $this->_config, $options, $cookies);
         return $this->cacheIfRequired($response);
@@ -339,13 +345,13 @@ class MobileConnectWebInterface
      * @param OperatorUrls $_operatorUrls
      * @return MobileConnectStatus
      */
-    public function makeDiscoveryWithoutCall($clientId, $clientSecret, $_operatorUrls, $clientName="Client Name"){
+    public function makeDiscoveryWithoutCall($clientId, $clientSecret, $operatorUrls, $clientName="Client Name"){
 
         $discoveryOptions = new FakeDiscoveryOptions();
         $discoveryOptions->setClientId($clientId);
         $discoveryOptions->setClientSecret($clientSecret);
         $discoveryOptions->setClientName($clientName);
-        $discoveryOptions->setOperatorUrls($_operatorUrls);
+        $discoveryOptions->setOperatorUrls($operatorUrls);
 
         $json = $discoveryOptions->getJson();
 

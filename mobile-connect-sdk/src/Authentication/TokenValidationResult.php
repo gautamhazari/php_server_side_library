@@ -54,6 +54,27 @@ class TokenValidationResult {
      * Neither the azp nor the aud claim in the id token match the client id used to make the auth request
      */
     const InvalidAudAndAzp = 16;
+
+    /**
+     * The at_hash claim in the id token is not present
+     */
+    const INVALID_AT_HASH = 17;
+
+    /**
+     * The acr_values claim in the id token is not present
+     */
+    const INVALID_ACR = 18;
+
+    /**
+     * The amr_values claim in the id token is not present
+     */
+    const INVALID_AMR = 19;
+
+    /**
+     * The hashed_login_hint claim in the id token is not present
+     */
+    const INVALID_HASHED_LOGIN_HINT = 20;
+
     /**
      * The iss claim in the id token does not match the expected issuer
      */

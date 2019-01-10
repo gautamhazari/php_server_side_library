@@ -12,22 +12,29 @@ namespace App\Http;
 use App\Http\Constants\Constants;
 use MCSDK\Constants\DefaultOptions;
 use MCSDK\Constants\Parameters;
+use MCSDK\Discovery\VersionDetection;
+use MCSDK\Exceptions\InvalidScopeException;
 use MCSDK\MobileConnectRequestOptions;
+use MCSDK\MobileConnectStatus;
 use MCSDK\Web\ResponseConverter;
 
 class EndpointUtils
 {
     public static function startEndpointRequest($mobileConnect, $config, $discoveryResponse, $authResponse) {
-        $status = null;
-        $mobileConnectWebResponse = ResponseConverter::Convert($authResponse);
-        $token = $mobileConnectWebResponse->getToken()[Parameters::ACCESS_TOKEN_HINT];
-        $apiVersion = $config->getApiVersion();
-        $scopes = $config->getScopes();
+        try {
+            $status = null;
+            $mobileConnectWebResponse = ResponseConverter::Convert($authResponse);
+            $token = $mobileConnectWebResponse->getToken()[Parameters::ACCESS_TOKEN_HINT];
+            $scopes = $config->getScopes();
+            $apiVersion = VersionDetection::getCurrentVersion($config->getApiVersion(), $scopes, $discoveryResponse->getProviderMetadata());
 
-        if ($apiVersion == (DefaultOptions::VERSION_1_1) & !empty($discoveryResponse->getOperatorUrls()->getUserInfoUrl())) {
-            $status = EndpointUtils::requestUserInfo($mobileConnect, $discoveryResponse, $scopes, $token);
-        } else if (($apiVersion == (DefaultOptions::VERSION_DI_2_3) || $apiVersion == (DefaultOptions::VERSION_2_0)) & !empty($discoveryResponse->getOperatorUrls()->getPremiumInfoUrl())) {
-            $status = EndpointUtils::requestIdentity($mobileConnect, $discoveryResponse, $scopes, $token);
+            if ($apiVersion == (DefaultOptions::VERSION_1_1) & !empty($discoveryResponse->getOperatorUrls()->getUserInfoUrl())) {
+                $status = EndpointUtils::requestUserInfo($mobileConnect, $discoveryResponse, $scopes, $token);
+            } else if (($apiVersion == (DefaultOptions::VERSION_DI_2_3) || $apiVersion == (DefaultOptions::VERSION_2_0)) & !empty($discoveryResponse->getOperatorUrls()->getPremiumInfoUrl())) {
+                $status = EndpointUtils::requestIdentity($mobileConnect, $discoveryResponse, $scopes, $token);
+            }
+        } catch (InvalidScopeException $e) {
+            return MobileConnectStatus::Error("invalid_scope", $e->getMessage());
         }
         return $status;
     }

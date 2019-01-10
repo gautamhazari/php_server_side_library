@@ -43,7 +43,7 @@ interface IAuthenticationService
      * @param AuthenticationOptions options Optional parameters
      */
     public function StartAuthentication($clientId, $authorizeUrl, $redirectUrl, $state, $nonce,
-        $encryptedMSISDN, $versions = null, AuthenticationOptions $options = null);
+        $encryptedMSISDN, $version, AuthenticationOptions $options = null);
 
     /**
      * Allows an application to use the authorization code obtained from authentication/authorization to obtain an access token
@@ -72,7 +72,7 @@ interface IAuthenticationService
      * @return Token if headless authentication is successful
      */
     public function RequestHeadlessAuthentication($clientId, $clientSecret, $authorizeUrl, $tokenUrl, $redirectUrl,
-        $state, $nonce, $encryptedMSISDN, SupportedVersions $versions = null, AuthenticationOptions $options = null);
+        $state, $nonce, $encryptedMSISDN, $version, AuthenticationOptions $options = null);
 
     /**
      * Allows an application to use the refresh token obtained from request token response and request for a token refresh.
