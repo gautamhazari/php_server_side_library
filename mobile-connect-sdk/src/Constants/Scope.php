@@ -45,6 +45,14 @@ class Scope
 
     const KYC_PLAIN = "mc_kyc_plain";
     const KYC_HASHED = "mc_kyc_hashed";
+    const ATTR_VM_MATCH = "mc_attr_vm_match";
+    const ATTR_VM_MATCH_HASH = "mc_attr_vm_match_hash";
+
+    const MC_INDIA_TC = "mc_india_tc";
+    const MC_MNV_VALIDATE = "mc_mnv_validate";
+    const MC_MNV_VALIDATE_PLUS = "mc_mnv_validate_plus";
+    const MC_ATTR_VM_SHARE = "mc_attr_vm_share";
+    const MC_ATTR_VM_SHARE_HASH = "mc_attr_vm_share_hash";
 
     const MCPREFIX = "mc_";
 }
