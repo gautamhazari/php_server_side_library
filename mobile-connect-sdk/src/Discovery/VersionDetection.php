@@ -51,7 +51,8 @@ class VersionDetection
 }
 
     private static function containsScopesV1_1($currentScopes) {
-        return (VersionDetection::containsOpenidScope($currentScopes) && sizeof($currentScopes) == 1) || VersionDetection::containsUniversalIndianScopes(currentScopes);
+        return (VersionDetection::containsOpenidScope($currentScopes) && sizeof($currentScopes) == 1) ||
+                (VersionDetection::containsOpenidScope($currentScopes) && VersionDetection::containsUniversalIndianScopes($currentScopes));
     }
 
     private static function containsScopesV2_0($currentScopes) {
