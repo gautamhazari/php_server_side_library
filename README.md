@@ -22,7 +22,7 @@ Run docker image:
 ```posh
 sudo docker run -p 80:80 -it -v /home/serverside/:/opt/lampp/htdocs/ cswl/xampp bash
 ```
-In Docker container run next commands:
+Please check, that your folder <code class="java-lang">/home/serverside/</code> contains downloaded SDK folders <code class="java-lang">php-server-side-library</code> and <code class="java-lang">mobile-connect-sdk</code> and run the next commands in Docker container:
 ```posh
 cd /opt/lampp/htdocs/php-server-side-library
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -31,6 +31,17 @@ mv .env.example .env
 php artisan key:generate
 chmod -R 777 /opt/lampp/htdocs/php-server-side-library/
 chmod -R 777 /opt/lampp/htdocs/mobile-connect-sdk/
+mysql</opt/lampp/htdocs/init_db.sql 
+```
+If your folder <code class="java-lang">/home/serverside/</code> contains only folder  <code class="java-lang">php_server_side_library</code>, please run the next commands:
+```posh
+cd /opt/lampp/htdocs/php_server_side_library/php-server-side-library
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+composer install
+mv .env.example .env
+php artisan key:generate
+chmod -R 777 /opt/lampp/htdocs/php_server_side_library/php-server-side-library/
+chmod -R 777 /opt/lampp/htdocs/php_server_side_library/mobile-connect-sdk/
 mysql</opt/lampp/htdocs/init_db.sql 
 ```
 Note: please use your actual path to PHP server side library in Docker image instead of /opt/lampp/htdocs/ if it is different.
