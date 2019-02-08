@@ -44,8 +44,8 @@ chmod -R 777 /opt/lampp/htdocs/php_server_side_library/php-server-side-library/
 chmod -R 777 /opt/lampp/htdocs/php_server_side_library/mobile-connect-sdk/
 mysql</opt/lampp/htdocs/init_db.sql 
 ```
-Note: please use your actual path to PHP server side library in Docker image instead of /opt/lampp/htdocs/ if it is different.
-Open the configuration file and change it: \php-server-side-library\app\data\data.json.
+Note: please use your actual path to PHP server side library in Docker image instead of <code class="java-lang">/opt/lampp/htdocs/</code> if it is different.
+Open the configuration file and change it: <code class="java-lang">\php-server-side-library\app\data\data.json</code>.
 Here are 10 parameters:
 ```posh
   {
