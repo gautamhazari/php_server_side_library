@@ -75,7 +75,7 @@ class Controller extends BaseController
             McUtils::setCacheByRequest($mcc, $mnc, $sourceIp, $msisdn, $response->getDiscoveryResponse());
             return  AuthWithDiscovery::startAuth(Controller::$_mobileConnect, $response, Controller::$_config);
         }
-        return HttpUtils::createResponse($response);
+        return HttpUtils::redirectToView($response, McUtils::getAuthName(Controller::$_config->getScopes()));
     }
 
     // Route ""
@@ -90,7 +90,8 @@ class Controller extends BaseController
             $authStatus = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, $discoveryResponse, $state, $nonce, new MobileConnectRequestOptions());
             $endPointStatus = EndpointUtils::startEndpointRequest(Controller::$_mobileConnect, Controller::$_config, $discoveryResponse, $authStatus);
             Controller::$_databaseHelper->clearDiscoveryCacheByState($state);
-            return HttpUtils::createResponse(!empty($endPointStatus) ? $endPointStatus:$authStatus);
+            $isPremiumInfo = !empty($endPointStatus);
+            return HttpUtils::redirectToView($isPremiumInfo ? $endPointStatus : $authStatus, $isPremiumInfo ? Status::PREMIUMINFO: Status::TOKEN);
 
         } elseif (!empty($mcc_mnc)){
             $response = Controller::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, null, $state, null, new MobileConnectRequestOptions());
@@ -100,7 +101,7 @@ class Controller extends BaseController
             $errorCode = Input::get(Parameters::ERROR);
             $errorDesc = Input::get(Parameters::ERROR_DESCRIPTION);
             Controller::$_databaseHelper->clearDiscoveryCacheByState($state);
-            return HttpUtils::createResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
+            return HttpUtils::redirectToView(MobileConnectStatus::Error($errorCode, $errorDesc, null), McUtils::getAuthName(Controller::$_config->getScopes()));
         }
     }
 
