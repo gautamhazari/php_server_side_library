@@ -10,7 +10,9 @@ namespace App\Http;
 
 
 use App\Http\Config\BaseConfig;
+use App\Http\Constants\Status;
 use MCSDK\Constants\DefaultOptions;
+use MCSDK\Constants\Scope;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\VersionDetection;
 use MCSDK\MobileConnectRequestOptions;
@@ -55,7 +57,7 @@ class McUtils
     public static function processAuthResponseResult($authResponse, $discoveryResponse) {
         $databaseHelper = new DatabaseHelper();
         if (McUtils::isErrorInResponse($authResponse)) {
-            return HttpUtils::createResponse($authResponse);
+            return HttpUtils::redirectToView($authResponse, McUtils::getAuthName(WdController::$_config->getScopes()));
         } else {
             $databaseHelper->writeDiscoveryResponseToDatabase($authResponse->getState(), $discoveryResponse);
             $databaseHelper->writeNonceToDatabase($authResponse->getState(), $authResponse->getNonce());
@@ -70,4 +72,11 @@ class McUtils
         }
     }
 
+    public static function getAuthName($currentScope) {
+        if (strpos($currentScope, Scope::AUTHN) !== false || $currentScope == Scope::OPENID) {
+            return Status::AUTHENTICATION;
+        } else if (strpos($currentScope, Scope::AUTHZ) !== false) {
+            return Status::AUTHORISATION;
+        }
+    }
 }

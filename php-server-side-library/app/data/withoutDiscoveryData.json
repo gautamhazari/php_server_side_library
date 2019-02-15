@@ -1,7 +1,7 @@
 {
 	"client_id": "M2UyMTcyNzgtNDI0MS00NjhiLWJhMzYtM2UyYjdkMzlmOTJlOm9wZXJhdG9yLWI=",
 	"clientSecret": "MTMwNzU3YWUtODlmOS00NTkxLWIwYzAtNjA1MmFiMWMzOTIyOm9wZXJhdG9yLWI=",
-	"redirectURL": "http://localhost/php-server-side-library/public/callback_wd",
+	"redirectURL": "http://localhost/php-server-side-library/public/callback",
 	"scope":"openid mc_authz",
 	"apiVersion":"mc_di_r2_v2.3",
 	"client_name":"PhpServerSideDemo",

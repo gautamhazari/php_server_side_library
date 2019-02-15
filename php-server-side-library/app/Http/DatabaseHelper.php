@@ -100,37 +100,28 @@ class DatabaseHelper
     }
 
 
-    private function getDiscoveryResponseByMsisdn($msisdn){
-        if(!empty($mcc) && !empty($mnc)){
-            $cached =  DB::connection("mysql")->select('select * from discovery_cache where msisdn=?', [$msisdn])[0];
-            $exp = $cached->exp;
-            $exp_date = DateTime::createFromFormat("c", $exp);
-            if($exp_date>new DateTime()){
-                return $cached->value;
-            }
-            else{
-                DB::connection("mysql")->table('discovery_cache')->where('msisdn', '=', $msisdn)->delete();
-                return null;
-            }
+    private function getDiscoveryResponseByMsisdn($msisdn) {
+        $cached = DB::connection("mysql")->select('select * from discovery_cache where msisdn=?', [$msisdn])[0];
+        $exp = $cached->exp;
+        $exp_date = DateTime::createFromFormat("c", $exp);
+        if ($exp_date > new DateTime()) {
+            return $cached->value;
+        } else {
+            DB::connection("mysql")->table('discovery_cache')->where('msisdn', '=', $msisdn)->delete();
+            return null;
         }
-        return null;
     }
 
 
-    private function getDiscoveryResponseByIP($ip){
-        if(!empty($mcc) && !empty($mnc)){
-            $cached =  DB::connection("mysql")->select('select * from discovery_cache where ip=?', [$ip])[0];
-            $exp = $cached->exp;
-            $exp_date = DateTime::createFromFormat("c", $exp);
-            if($exp_date>new DateTime()){
-                return $cached->value;
-            }
-            else{
-                DB::connection("mysql")->table('discovery_cache')->where('ip', '=', $ip)->delete();
-                return null;
-            }
+    private function getDiscoveryResponseByIP($ip) {
+        $cached = DB::connection("mysql")->select('select * from discovery_cache where ip=?', [$ip])[0];
+        $exp = $cached->exp;
+        $exp_date = DateTime::createFromFormat("c", $exp);
+        if ($exp_date > new DateTime()) {
+            return $cached->value;
+        } else {
+            DB::connection("mysql")->table('discovery_cache')->where('ip', '=', $ip)->delete();
+            return null;
         }
-        return null;
     }
-
 }

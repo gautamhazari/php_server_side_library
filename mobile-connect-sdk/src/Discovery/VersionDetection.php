@@ -8,7 +8,7 @@
 
 namespace MCSDK\Discovery;
 
-
+use App\Http\HttpUtils;
 use MCSDK\Constants\Scope;
 use MCSDK\Exceptions\InvalidScopeException;
 use Zend\Stdlib\StringUtils;
@@ -20,7 +20,7 @@ class VersionDetection
         if (!empty($version) && VersionDetection::isVersionSupported($version)) {
             return $version;
         } else {
-            $currentScopes = StringUtils::convertToListBySpace($scope);
+            $currentScopes = HttpUtils::convertToListBySpace($scope);
             if (in_array(Version::MC_DI_R2_V2_3, $supportedVersions) && VersionDetection::containsScopesV2_3($currentScopes)) {
                 return Version::MC_DI_R2_V2_3;
             } else if (in_array(Version::MC_V2_0, $supportedVersions) && VersionDetection::containsScopesV2_0($currentScopes)) {
