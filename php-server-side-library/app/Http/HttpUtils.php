@@ -14,6 +14,7 @@ use App\Http\Constants\Constants;
 use MCSDK\MobileConnectStatus;
 use MCSDK\Utils\JsonUtils;
 use MCSDK\Web\ResponseConverter;
+use phpDocumentor\Reflection\Types\Array_;
 use Symfony\Component\HttpFoundation\Response;
 
 class HttpUtils
@@ -34,6 +35,10 @@ class HttpUtils
             return view(Constants::FAIL_KEY, $modelMap);
         }
         return view(Constants::SUCCESS_KEY, $modelMap);
+    }
+
+    public static function convertToListBySpace($initString) {
+        return preg_split("/[\s,]+/", $initString);
     }
 }
 
