@@ -31,6 +31,11 @@ class Constants
     public const DATA_PATH = "data.json";
     public const WD_DATA_PATH = "withoutDiscoveryData.json";
 
+    public const OPERATION_KEY = "operation";
+    public const STATUS_KEY = "status";
+    public const FAIL_KEY = "fail";
+    public const SUCCESS_KEY = "success";
+
     public const IDENTITY_SCOPES = array(Scope::IDENTITY_PHONE, Scope::IDENTITY_SIGNUP,
             Scope::IDENTITY_NATIONALID, Scope::IDENTITY_SIGNUPPLUS, Scope::KYC_HASHED, Scope::KYC_PLAIN);
     public const USERINFO_SCOPES = array(Scope::PROFILE, Scope::EMAIL, Scope::ADDRESS,

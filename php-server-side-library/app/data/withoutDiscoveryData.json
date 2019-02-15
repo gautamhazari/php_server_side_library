@@ -1,15 +1,15 @@
 {
-	"client_id": "M2UyMTcyNzgtNDI0MS00NjhiLWJhMzYtM2UyYjdkMzlmOTJlOm9wZXJhdG9yLWI=",
-	"clientSecret": "MTMwNzU3YWUtODlmOS00NTkxLWIwYzAtNjA1MmFiMWMzOTIyOm9wZXJhdG9yLWI=",
-	"redirectURL": "http://localhost/php-server-side-library/public/callback_wd",
+	"client_id": "YTQxNmRiMTUtZmQxNS00ZjA0LWIwNTktZmU2MzhhM2YzMTMxOm9wZXJhdG9yLWI=",
+	"clientSecret": "YzI3OGZjYmUtZWU0ZS00NDFkLTkyMDktNWY1MTc5NGUzZGI5Om9wZXJhdG9yLWI=",
+	"redirectURL": "http://localhost/php-server-side-library/public/callback",
 	"scope":"openid mc_authz",
 	"apiVersion":"mc_di_r2_v2.3",
-	"client_name":"PhpServerSideDemo",
+	"client_name":"name",
 	"context":"demo",
 	"binding_message":"demo auth",
-	"authURL": "https://operator-b.sandbox.mobileconnect.io/oidc/authorize",
-	"tokenURL": "https://operator-b.sandbox.mobileconnect.io/oidc/accesstoken",
-	"userInfoURl": "https://operator-b.sandbox.mobileconnect.io/oidc/userinfo",
-	"premiumInfoURl": "https://operator-b.sandbox.mobileconnect.io/oidc/premiuminfo",
+	"authURL": "https://operator-b.integration.sandbox.mobileconnect.io/oidc/authorize",
+	"tokenURL": "https://operator-b.integration.sandbox.mobileconnect.io/oidc/accesstoken",
+	"userInfoURl": "https://operator-b.integration.sandbox.mobileconnect.io/oidc/userinfo",
+	"premiumInfoURl": "https://operator-b.integration.sandbox.mobileconnect.io/oidc/premiuminfo",
 	"metadataURl": ""
 }

@@ -6,9 +6,11 @@ require_once(dirname(__FILE__) . '/../../../vendor/autoload.php');
 use App\Http\Auth\AuthRunner;
 use App\Http\Auth\AuthWithoutDiscovery;
 use App\Http\Config\ConfigWd;
+use App\Http\Constants\Status;
 use App\Http\DatabaseHelper;
 use App\Http\EndpointUtils;
 use App\Http\HttpUtils;
+use App\Http\McUtils;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -67,10 +69,11 @@ class WdController extends BaseController
             $nonce = WdController::$_databaseHelper->getNonceFromDatabase($state);
             $authStatus = WdController::$_mobileConnect->HandleUrlRedirectWithDiscoveryResponse($requestUri, $discoveryResponse, $state, $nonce, new MobileConnectRequestOptions());
             $endPointStatus = EndpointUtils::startEndpointRequest(WdController::$_mobileConnect, WdController::$_config, $discoveryResponse, $authStatus);
-            return HttpUtils::createResponse(!empty($endPointStatus)?$endPointStatus:$authStatus);
-
+            $isPremiumInfo = !empty($endPointStatus);
+            return HttpUtils::redirectToView($isPremiumInfo ? $endPointStatus : $authStatus, $isPremiumInfo ? Status::PREMIUMINFO: Status::TOKEN);
         } else {
-            return HttpUtils::createResponse(MobileConnectStatus::Error($errorCode, $errorDesc, null));
+            return HttpUtils::redirectToView(MobileConnectStatus::Error($errorCode, $errorDesc, null), McUtils::getAuthName(WdController::$_config->getScopes()));
         }
     }
+
 }

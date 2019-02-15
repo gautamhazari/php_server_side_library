@@ -41,7 +41,7 @@ class DiscoveryResponse
     private $_responseCode;
     private $_headers;
     private $_responseData;
-    private $_ttl;
+    private $_ttl = null;
     private $_providerMetadata;
     private $_operatorUrls;
     private $_cookie;
