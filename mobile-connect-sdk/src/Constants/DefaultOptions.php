@@ -61,6 +61,6 @@ class DefaultOptions
     const VERSION_SI_1_0 = "mc_si_r2_v1.0";
 
     const SDK_VERSION = "";
-    const SERVER_SIDE_VERSION = "PHP-3.1.0";
+    const SERVER_SIDE_VERSION = "PHP-3.3.0";
 }
 
