@@ -7,7 +7,7 @@
 	"xRedirect": "False",
 	"includeRequestIP": "True",
 	"scope":"openid mc_authn",
-	"clientName": "demoAppSDK",
+	"client_name": "demoAppSDK",
 	"context":"demo",
 	"binding_message":"demo auth"
 }
