@@ -1,16 +1,13 @@
 {
 	"msisdn": "+447700900301",
-	"client_id": "9ac98fee-ffcb-4b23-b513-8c8c509c67d9",
-	"clientSecret": "e2e144ba-02ba-4c86-b706-9aadd15098bf",
-	"client_name": "demoAppSDK",
-	"discoveryURL": "https://discover.mobileconnect.io/gsma/v2/discovery",
-	"redirectURL": "http://172.19.2.20:8080/server_side_api/discovery_callback",
+	"client_id": "6b5d870c-624e-464b-b826-bd21a1357703",
+  	"clientSecret": "0941089b-3774-407b-980b-f80fa7f8c4f6",
+	"discoveryURL": "https://discovery.sandbox.mobileconnect.io/v2/discovery",
+	"redirectURL": "http://localhost/php-server-side-library/public/callback",
 	"xRedirect": "False",
 	"includeRequestIP": "True",
-	"apiVersion": "mc_di_r2_v2.3",
-	"scope": "openid mc_identity_phonenumber",
-	"acrValues": "2",
-	"binding_message":"demo auth",
+	"scope":"openid mc_authn",
+	"client_name": "demoAppSDK",
 	"context":"demo",
 	"MaxDiscoveryCacheSize": 104857600
 }
