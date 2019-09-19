@@ -41,6 +41,10 @@ class DiscoveryResponseData
     /**
      * Parsed from JSON response
      */
+    private $_subscriber_id_token;
+    /**
+     * Parsed from JSON response
+     */
     private $_error;
     /**
      * Parsed from JSON response
@@ -67,8 +71,16 @@ class DiscoveryResponseData
         return $this->_subscriber_id;
     }
 
+    public function get_subscriber_id_token() {
+        return $this->_subscriber_id_token;
+    }
+
     public function set_subscriber_id($_subscriber_id){
         $this->_subscriber_id = $_subscriber_id;
+    }
+
+    public function set_subscriber_id_token($_subscriber_id_token){
+        $this->_subscriber_id_token = $_subscriber_id_token;
     }
 
     public function get_error() {

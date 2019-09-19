@@ -44,6 +44,7 @@ class Parameters
     const SOURCE_IP = "sourceIp";
     const MCC_MNC = "mcc_mnc";
     const SUBSCRIBER_ID = "subscriber_id";
+    const SUBSCRIBER_ID_TOKEN = "subscriber_id_token";
 
     //Required params for authentication
     const CLIENT_ID = "client_id";

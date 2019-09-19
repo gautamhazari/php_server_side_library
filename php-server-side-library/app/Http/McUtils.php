@@ -12,6 +12,7 @@ namespace App\Http;
 use App\Http\Config\BaseConfig;
 use App\Http\Constants\Status;
 use MCSDK\Constants\DefaultOptions;
+use MCSDK\Constants\Parameters;
 use MCSDK\Constants\Scope;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\VersionDetection;
@@ -28,6 +29,7 @@ class McUtils
 
         $options = new MobileConnectRequestOptions();
         $options->getAuthenticationOptions()->setVersion($apiVersion);
+        $options->getAuthenticationOptions()->setLoginHintToken($discoveryResponse->getResponseData()[Parameters::SUBSCRIBER_ID_TOKEN]);
         $options->setScope($scopes);
         $options->setContext(($apiVersion == DefaultOptions::VERSION_2_0 || $apiVersion == DefaultOptions::VERSION_DI_2_3) ? $context : null);
         $options->setBindingMessage(($apiVersion == DefaultOptions::VERSION_2_0 || $apiVersion == DefaultOptions::VERSION_DI_2_3) ? $bindingMessage : null);

@@ -58,6 +58,10 @@ class Response
      * Parsed from JSON response
      */
     private $_subscriber_id;
+    /**
+     * Parsed from JSON response
+     */
+    private $_subscriber_id_token;
 
     public function get_serving_operator() {
         return $this->_serving_operator;
@@ -105,6 +109,14 @@ class Response
 
     public function set_subscriber_id($_subscriber_id){
         $this->_subscriber_id = $_subscriber_id;
+    }
+
+    public function get_subscriber_id_token() {
+        return $this->_subscriber_id_token;
+    }
+
+    public function set_subscriber_id_token($_subscriber_id_token){
+        $this->_subscriber_id_token = $_subscriber_id_token;
     }
 
 }

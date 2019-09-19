@@ -43,6 +43,10 @@ class Scope
     const IDENTITY_SIGNUPPLUS = "mc_identity_signupplus";
     const IDENTITY_NATIONALID = "mc_identity_nationalid";
 
+    const MC_PHONE = "mc_phonenumber";
+    const MC_SIGNUP = "mc_signup";
+    const MC_NATIONALID = "mc_nationalid";
+
     const KYC_PLAIN = "mc_kyc_plain";
     const KYC_HASHED = "mc_kyc_hashed";
     const ATTR_VM_MATCH = "mc_attr_vm_match";

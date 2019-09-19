@@ -85,7 +85,7 @@ class AuthenticationService implements IAuthenticationService {
 
         $options->setState($state);
         $options->setNonce($nonce);
-        if ($options->getLoginTokenHint() === null && $options->getLoginHint() === null) {
+        if ($options->getLoginHintToken() === null && $options->getLoginHint() === null) {
             if (!empty($encryptedMSISDN)) {
                 $options->setLoginHint(LoginHint::GenerateForEncryptedMSISDN($encryptedMSISDN));
             }
@@ -215,11 +215,11 @@ class AuthenticationService implements IAuthenticationService {
             Parameters::CLAIMS => $this->encodeValue($this->getClaimsString($options)),
             Parameters::VERSION => $this->encodeValue($version)
         );
-        if ($options->getLoginTokenHint() === null) {
+        if ($options->getLoginHintToken() === null) {
             $authParamters[Parameters::LOGIN_HINT] = $this->encodeValue($options->getLoginHint());
         }
         else{
-            $authParamters[Parameters::LOGIN_TOKEN_HINT] = $this->encodeValue($options->getLoginTokenHint());
+            $authParamters[Parameters::LOGIN_TOKEN_HINT] = $this->encodeValue($options->getLoginHintToken());
         }
 
         if ($useAuthorize) {
