@@ -33,6 +33,7 @@ class ParsedDiscoveryRedirect
     private $_selectedMCC;
     private $_selectedMNC;
     private $_encryptedMSISDN;
+    private $_loginHintToken;
 
     /**
      * The Mobile Country Code of the selected operator
@@ -72,10 +73,19 @@ class ParsedDiscoveryRedirect
      * @param $selectedMNC The selected mobile network code
      * @param $encryptedMSISDN The encrypted MSISDN or subscriber id
     */
-    public function __construct($selectedMCC, $selectedMNC, $encryptedMSISDN)
+    public function __construct($selectedMCC, $selectedMNC, $encryptedMSISDN , $loginHintToken)
     {
         $this->_selectedMCC = $selectedMCC;
         $this->_selectedMNC = $selectedMNC;
         $this->_encryptedMSISDN = $encryptedMSISDN;
+        $this->_loginHintToken = $loginHintToken;
+    }
+
+    /**
+     * login hint token
+     */
+    public function getLoginHintToken()
+    {
+        return $this->_loginHintToken;
     }
 }

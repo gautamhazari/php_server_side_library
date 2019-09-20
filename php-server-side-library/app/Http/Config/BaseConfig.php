@@ -22,6 +22,7 @@ abstract class BaseConfig
     protected $redirectURL;
     protected $xRedirect;
     protected $includeRequestIP;
+    protected $loginHintTokenPreference ;
     protected $apiVersion;
     protected $clientName;
     protected $scopes;
@@ -109,6 +110,10 @@ abstract class BaseConfig
 
     public function isIncludeRequestIP() {
         return $this->includeRequestIP;
+    }
+
+    public function isLoginHintTokenPreference () {
+        return $this->loginHintTokenPreference;
     }
 
     public function getApiVersion() {

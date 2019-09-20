@@ -206,7 +206,7 @@ class AuthenticationService implements IAuthenticationService {
             Parameters::STATE => $this->encodeValue($options->getState()),
             Parameters::NONCE => $this->encodeValue($options->getNonce()),
             Parameters::DISPLAY => $this->encodeValue($options->getDisplay()),
-            Parameters::PROMPT => $this->encodeValue($options->getPrompt()),
+            Parameters::PROMPT => $this->encodeValue($this->getPrompt($options->getPrompt(), $version)),
             Parameters::MAX_AGE => $this->encodeValue($options->getMaxAge()),
             Parameters::UI_LOCALES => $this->encodeValue($options->getUiLocales()),
             Parameters::CLAIMS_LOCALES => $this->encodeValue( $options->getClaimsLocales()),
@@ -229,6 +229,21 @@ class AuthenticationService implements IAuthenticationService {
         }
 
         return $authParamters;
+    }
+
+    private function getPrompt($currentPrompt, $currentVersion) {
+        if (empty($currentPrompt)) {
+            return null;
+        }
+        if ($currentVersion != DefaultOptions::VERSION_DI_3_0) {
+            if ($currentPrompt == Parameters::CONSENT || $currentPrompt == Parameters::SELECT_ACCOUNT) {
+                return $currentPrompt;
+            }
+        }
+        if ($currentPrompt == Parameters::NONE || $currentPrompt == Parameters::LOGIN || $currentPrompt == Parameters::NO_SEAM) {
+            return $currentPrompt;
+        }
+        return null;
     }
 
     private function getClaimsString($options) {

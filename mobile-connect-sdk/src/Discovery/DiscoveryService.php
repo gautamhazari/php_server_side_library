@@ -202,7 +202,7 @@ class DiscoveryService implements IDiscoveryService {
         ValidationUtils::validateParameter($redirectUrl, "redirectUrl");
         parse_str(parse_url($redirectUrl, PHP_URL_QUERY), $query);
         if (empty($query)) {
-            return new ParsedDiscoveryRedirect(null, null, null);
+            return new ParsedDiscoveryRedirect(null, null, null, null);
         }
         $mcc_mnc = $query[Parameters::MCC_MNC];
         $encryptedMSISDN = isset($query[Parameters::SUBSCRIBER_ID]) ? $query[Parameters::SUBSCRIBER_ID] : null;
@@ -216,7 +216,9 @@ class DiscoveryService implements IDiscoveryService {
                 $mnc = $parts[1];
             }
         }
-        return new ParsedDiscoveryRedirect($mcc, $mnc, $encryptedMSISDN);
+
+        $loginHintToken = isset($query[Parameters::SUBSCRIBER_ID_TOKEN]) ? $query[Parameters::SUBSCRIBER_ID_TOKEN] : null;
+        return new ParsedDiscoveryRedirect($mcc, $mnc, $encryptedMSISDN, $loginHintToken);
     }
 
     public function completeSelectedOperatorDiscovery($clientId, $clientSecret, $discoveryUrl,

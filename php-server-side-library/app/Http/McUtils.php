@@ -29,10 +29,11 @@ class McUtils
 
         $options = new MobileConnectRequestOptions();
         $options->getAuthenticationOptions()->setVersion($apiVersion);
-        $options->getAuthenticationOptions()->setLoginHintToken($discoveryResponse->getResponseData()[Parameters::SUBSCRIBER_ID_TOKEN]);
         $options->setScope($scopes);
-        $options->setContext(($apiVersion == DefaultOptions::VERSION_2_0 || $apiVersion == DefaultOptions::VERSION_DI_2_3) ? $context : null);
-        $options->setBindingMessage(($apiVersion == DefaultOptions::VERSION_2_0 || $apiVersion == DefaultOptions::VERSION_DI_2_3) ? $bindingMessage : null);
+        $options->setContext(($apiVersion == DefaultOptions::VERSION_2_0 || $apiVersion == DefaultOptions::VERSION_DI_2_3
+            || $apiVersion == DefaultOptions::VERSION_DI_3_0) ? $context : null);
+        $options->setBindingMessage(($apiVersion == DefaultOptions::VERSION_2_0 || $apiVersion == DefaultOptions::VERSION_DI_2_3
+            || $apiVersion == DefaultOptions::VERSION_DI_3_0) ? $bindingMessage : null);
         $options->setClientName($clientName);
         return $options;
     }

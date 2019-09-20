@@ -24,6 +24,7 @@ class Config extends BaseConfig
     private function getSpecValuesFromJson($json) {
         $this->xRedirect = $json[Parameters::X_REDIRECT];
         $this->includeRequestIP = $json[Parameters::INCLUDE_REQ_IP];
+        $this->loginHintTokenPreference = $json[Parameters::LOGIN_HINT_TOKEN_PREFERENCE];
         $this->discoveryURL = $json[Constants::DISCOVERY_URL];
     }
 

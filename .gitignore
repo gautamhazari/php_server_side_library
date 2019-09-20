@@ -10,7 +10,7 @@
 /php-server-side-sdk/Homestead.yaml
 /php-server-side-sdk/npm-debug.log
 /php-server-side-sdk/yarn-error.log
-/php-server-side-sdk/.env
+#/php-server-side-sdk/.env
 /mobile-connect-sdk/node_modules
 /mobile-connect-sdk/public/hot
 /mobile-connect-sdk/public/storage
@@ -23,4 +23,4 @@
 /mobile-connect-sdk/Homestead.yaml
 /mobile-connect-sdk/npm-debug.log
 /mobile-connect-sdk/yarn-error.log
-/mobile-connect-sdk/.env
+#/mobile-connect-sdk/.env

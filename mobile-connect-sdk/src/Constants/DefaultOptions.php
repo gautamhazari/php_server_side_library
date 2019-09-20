@@ -58,9 +58,10 @@ class DefaultOptions
     const VERSION_1_1 = "mc_v1.1";
     const VERSION_2_0 = "mc_v2.0";
     const VERSION_DI_2_3 = "mc_di_r2_v2.3";
+    const VERSION_DI_3_0 = "mc_di_v3.0";
     const VERSION_SI_1_0 = "mc_si_r2_v1.0";
 
     const SDK_VERSION = "";
-    const SERVER_SIDE_VERSION = "PHP-3.3.2";
+    const SERVER_SIDE_VERSION = "PHP-3.4.0";
 }
 

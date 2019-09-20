@@ -29,6 +29,7 @@ use MCSDK\Authentication\AuthenticationService;
 use MCSDK\Authentication\IAuthenticationService;
 use MCSDK\Authentication\IJWKeysetService;
 use MCSDK\Authentication\RequestTokenResponse;
+use MCSDK\Constants\Parameters;
 use MCSDK\Discovery\DiscoveryResponse;
 use MCSDK\Discovery\DiscoveryService;
 use MCSDK\Discovery\VersionDetection;
@@ -261,8 +262,11 @@ class MobileConnectInterfaceHelper {
             $responseData = $response->getResponseData();
             if (!isset($responseData['subscriber_id'])) {
                 $responseData['subscriber_id'] = $parsedRedirect->getEncryptedMSISDN();
-                $response->setResponseData($responseData);
             }
+            if (!isset($responseData[Parameters::SUBSCRIBER_ID_TOKEN])) {
+                $responseData[Parameters::SUBSCRIBER_ID_TOKEN] = $parsedRedirect->getLoginHintToken();
+            }
+            $response->setResponseData($responseData);
 
         }
         catch (Exception $ex) {

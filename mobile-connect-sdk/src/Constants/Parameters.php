@@ -59,6 +59,7 @@ class Parameters
     const LOGIN_TOKEN_HINT="login_token_hint";
     const X_REDIRECT = "xRedirect";
     const INCLUDE_REQ_IP = "includeRequestIP";
+    const LOGIN_HINT_TOKEN_PREFERENCE = "loginHintTokenPreference ";
     const API_VERS = "apiVersion";
     const RESPONSE_MODE = "response_mode";
 
@@ -77,6 +78,12 @@ class Parameters
     const CLIENT_NAME = "client_name";
     const CONTEXT = "context";
     const BINDING_MESSAGE = "binding_message";
+
+    const LOGIN = "login";
+    const NONE = "none";
+    const CONSENT = "consent";
+    const SELECT_ACCOUNT = "select_account";
+    const NO_SEAM = "no_seam";
 
     //Params for AuthorizationResponse
     const ERROR = "error";

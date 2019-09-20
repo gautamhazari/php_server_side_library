@@ -30,7 +30,8 @@ class EndpointUtils
 
             if ($apiVersion == (DefaultOptions::VERSION_1_1) & !empty($discoveryResponse->getOperatorUrls()->getUserInfoUrl())) {
                 $status = EndpointUtils::requestUserInfo($mobileConnect, $discoveryResponse, $scopes, $token);
-            } else if (($apiVersion == (DefaultOptions::VERSION_DI_2_3) || $apiVersion == (DefaultOptions::VERSION_2_0)) & !empty($discoveryResponse->getOperatorUrls()->getPremiumInfoUrl())) {
+            } else if (($apiVersion == (DefaultOptions::VERSION_DI_2_3) || $apiVersion == (DefaultOptions::VERSION_2_0)
+                    || $apiVersion == (DefaultOptions::VERSION_DI_3_0)) & !empty($discoveryResponse->getOperatorUrls()->getPremiumInfoUrl())) {
                 $status = EndpointUtils::requestIdentity($mobileConnect, $discoveryResponse, $scopes, $token);
             }
         } catch (InvalidScopeException $e) {

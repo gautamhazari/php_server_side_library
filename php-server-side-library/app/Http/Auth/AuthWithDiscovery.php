@@ -12,8 +12,11 @@ namespace App\Http\Auth;
 use App\Http\Auth\MobileConnectWebInterface;
 use App\Http\Claims\KYCClaimsParameter;
 use App\Http\McUtils;
+use MCSDK\Constants\DefaultOptions;
 use MCSDK\Constants\Parameters;
 use MCSDK\Constants\Scope;
+use MCSDK\Discovery\VersionDetection;
+use MCSDK\Exceptions\InvalidScopeException;
 
 class AuthWithDiscovery
 {
@@ -21,6 +24,22 @@ class AuthWithDiscovery
         $sdkSession = $response->getSDKSession();
         $subscriberId = $response->getDiscoveryResponse()->getResponseData()[Parameters::SUBSCRIBER_ID];
         $options = McUtils::getMcOptions($config, $response->getDiscoveryResponse());
+
+        $loginHintTokenPreference = $config->isLoginHintTokenPreference();
+        $subscriberIdToken = $response->getDiscoveryResponse()->getResponseData()[Parameters::SUBSCRIBER_ID_TOKEN];
+        try {
+            if (VersionDetection::getCurrentVersion($config->getApiVersion(), $config->getScopes(),
+                    $response->getDiscoveryResponse()->getProviderMetadata()) == DefaultOptions::VERSION_DI_3_0) {
+                $loginHintTokenPreference = false;
+            }
+        } catch (InvalidScopeException $e) {}
+
+        if (!$loginHintTokenPreference && !empty($subscriberId)) {
+            $subscriberIdToken = null;
+        } else if (!empty($subscriberIdToken)) {
+            $subscriberId = null;
+        }
+        $options->getAuthenticationOptions()->setLoginHintToken($subscriberIdToken);
 
         if (strpos($config->getScopes(), Scope::KYC) !== false) {
             $status = AuthWithDiscovery::startKYC($mobileConnect, $sdkSession, $subscriberId, $options, $config);
