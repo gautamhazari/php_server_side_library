@@ -144,7 +144,7 @@ class AuthenticationService implements IAuthenticationService {
         }
     }
 
-    public function RequestToken($clientId, $clientSecret, $requestTokenUrl, $redirectUrl, $code) {
+    public function RequestToken($clientId, $clientSecret, $requestTokenUrl, $redirectUrl, $code, $isBasicAuth=true) {
         ValidationUtils::validateParameter($clientId, "clientId");
         ValidationUtils::validateParameter($clientSecret, "clientSecret");
         ValidationUtils::validateParameter($requestTokenUrl, "requestTokenUrl");
@@ -157,7 +157,7 @@ class AuthenticationService implements IAuthenticationService {
                 Parameters::CODE => $code,
                 Parameters::GRANT_TYPE => DefaultOptions::GRANT_TYPE
             );
-            $authentication = RestAuthentication::Basic($clientId, $clientSecret);
+            $authentication = $isBasicAuth ? RestAuthentication::Basic($clientId, $clientSecret) : null;
             $response = $this->_client->post($requestTokenUrl, $authentication, $formData, null, null, null, null, null);
 
             return new RequestTokenResponse($response);
@@ -311,7 +311,7 @@ class AuthenticationService implements IAuthenticationService {
         return $this->RequestToken($clientId, $clientSecret, $tokenUrl, $redirectUrl, $code);
     }
 
-    public function RefreshToken($clientId, $clientSecret, $refreshTokenUrl, $refreshToken) {
+    public function RefreshToken($clientId, $clientSecret, $refreshTokenUrl, $refreshToken, $isBasicAuth=true) {
         ValidationUtils::validateParameter($clientId, "clientId");
         ValidationUtils::validateParameter($clientSecret, "clientSecret");
         ValidationUtils::validateParameter($refreshTokenUrl, "refreshTokenUrl");
@@ -322,7 +322,7 @@ class AuthenticationService implements IAuthenticationService {
                 Parameters::REFRESH_TOKEN => $refreshToken,
                 Parameters::GRANT_TYPE => GrantTypes::REFRESH_TOKEN
             );
-            $authentication = RestAuthentication::Basic($clientId, $clientSecret);
+            $authentication =  $isBasicAuth ? RestAuthentication::Basic($clientId, $clientSecret) : null;
             $response = $this->_client->post($refreshTokenUrl, $authentication, $formData, null, null, null, null, null);
 
             return new RequestTokenResponse($response);
@@ -335,7 +335,7 @@ class AuthenticationService implements IAuthenticationService {
         }
     }
 
-    public function RevokeToken($clientId, $clientSecret, $revokeTokenUrl, $token, $tokenTypeHint) {
+    public function RevokeToken($clientId, $clientSecret, $revokeTokenUrl, $token, $tokenTypeHint, $isBasicAuth=true) {
         ValidationUtils::validateParameter($clientId, "clientId");
         ValidationUtils::validateParameter($clientSecret, "clientSecret");
         ValidationUtils::validateParameter($revokeTokenUrl, "revokeTokenUrl");
@@ -348,7 +348,7 @@ class AuthenticationService implements IAuthenticationService {
             if (!empty($tokenTypeHint)) {
                 $formData[Parameters::TOKEN_TYPE_HINT] = $tokenTypeHint;
             }
-            $authentication = RestAuthentication::Basic($clientId, $clientSecret);
+            $authentication =  $isBasicAuth ? RestAuthentication::Basic($clientId, $clientSecret) : null;
             $response = $this->_client->post($revokeTokenUrl, $authentication, $formData, null, null, null, null, null);
             return new RevokeTokenResponse($response);
         } catch (Zend\Http\Exception\RuntimeException $ex) {
