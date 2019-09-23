@@ -24,6 +24,7 @@
 */
 namespace MCSDK\Discovery;
 use MCSDK\Constants\LinkRels;
+use MCSDK\Utils\HttpUtils;
 
 /**
  * Object to hold the operator specific urls returned from a successful discovery process call
@@ -192,6 +193,9 @@ class OperatorUrls
         $operatorUrls->setPremiumInfoUrl(static::getUrl($links, LinkRels::PREMIUMINFO));
         $operatorUrls->setJWKSUrl(static::getUrl($links, LinkRels::JWKS));
         $operatorUrls->setProviderMetadataUrl(static::getUrl($links, LinkRels::OPENID_CONFIGURATION));
+        if (empty(static::getUrl($links, LinkRels::OPENID_CONFIGURATION))) {
+            $operatorUrls->setProviderMetadataUrl(HttpUtils::BuildUrl(static::getUrl($links, LinkRels::ISSUER), LinkRels::PROVIDER_METADATA_POSTFIX));
+        }
         $operatorUrls->setRefreshTokenUrl(static::getUrl($links, LinkRels::TOKENREFRESH));
         $operatorUrls->setRevokeTokenUrl(static::getUrl($links, LinkRels::TOKENREVOKE));
         return $operatorUrls;

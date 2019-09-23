@@ -67,6 +67,18 @@ class HttpUtils {
         return isset($query[$value]) ? $query[$value] : null;
     }
 
+    public static function BuildUrl($host, $postfix) {
+        if (empty($host)) {
+            return $host;
+        }
+        $separator = "/";
+        if ($host[strlen($host) - 1] === $separator) {
+            return $host.$postfix;
+        } else {
+            return $host.$separator.$postfix;
+        }
+    }
+
     /**
      * Returns url components
      * @param $url Url to parse

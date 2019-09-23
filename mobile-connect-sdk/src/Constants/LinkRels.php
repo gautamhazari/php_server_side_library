@@ -59,6 +59,16 @@ class LinkRels
      * Key for openid-configuration
      */
     const OPENID_CONFIGURATION = "openid-configuration";
+    /**
+     * Key for issuer
+     */
+    const ISSUER = "issuer";
+
+    /**
+     * Key for issuer
+     */
+    const PROVIDER_METADATA_POSTFIX = ".well-known/openid-configuration";
+
 
     /**
      * Key for token refresh url
