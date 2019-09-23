@@ -21,6 +21,9 @@ class VersionDetection
             return $version;
         } else {
             $currentScopes = HttpUtils::convertToListBySpace($scope);
+            if (in_array(Version::MC_DI_V3_0, $supportedVersions) && VersionDetection::containsScopesV3_0($currentScopes)) {
+                return Version::MC_DI_V3_0;
+            }
             if (in_array(Version::MC_DI_R2_V2_3, $supportedVersions) && VersionDetection::containsScopesV2_3($currentScopes)) {
                 return Version::MC_DI_R2_V2_3;
             } else if (in_array(Version::MC_V2_0, $supportedVersions) && VersionDetection::containsScopesV2_0($currentScopes)) {
@@ -65,6 +68,13 @@ class VersionDetection
     private static function containsScopesV2_3($currentScopes) {
         return VersionDetection::containsOpenidScope($currentScopes) & (VersionDetection::containsScopesV2_0($currentScopes) || in_array(Scope::KYC_HASHED, $currentScopes)
                 || in_array(Scope::KYC_PLAIN, $currentScopes));
+    }
+
+    private static function containsScopesV3_0($currentScopes) {
+        return VersionDetection::containsOpenidScope($currentScopes) & (in_array(Scope::AUTHN, $currentScopes) || in_array(Scope::AUTHZ, $currentScopes) ||
+                in_array(Scope::MC_PHONE, $currentScopes) || in_array(Scope::MC_NATIONALID, $currentScopes) ||
+                in_array(Scope::MC_SIGNUP, $currentScopes) || VersionDetection::containsUniversalIndianScopes($currentScopes)
+                || in_array(Scope::KYC_HASHED, $currentScopes) || in_array(Scope::KYC_PLAIN, $currentScopes));
     }
 
     private static function getSupportedVersions($providerMetadata) {
