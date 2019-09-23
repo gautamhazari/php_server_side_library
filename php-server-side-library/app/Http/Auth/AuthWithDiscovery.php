@@ -29,10 +29,10 @@ class AuthWithDiscovery
         $options = McUtils::getMcOptions($config, $response->getDiscoveryResponse());
 
         $loginHintTokenPreference = $config->isLoginHintTokenPreference();
-        $subscriberIdToken = $responseData[Parameters::SUBSCRIBER_ID_TOKEN];
+        isset($responseData[Parameters::SUBSCRIBER_ID_TOKEN]) ? $subscriberIdToken = $responseData[Parameters::SUBSCRIBER_ID_TOKEN] : null;
         try {
             if (VersionDetection::getCurrentVersion($config->getApiVersion(), $config->getScopes(),
-                    $response->getDiscoveryResponse()->getProviderMetadata()) == DefaultOptions::VERSION_DI_3_0) {
+                    $response->getDiscoveryResponse()->getProviderMetadata()) != DefaultOptions::VERSION_DI_3_0) {
                 $loginHintTokenPreference = false;
             }
         } catch (InvalidScopeException $e) {}
