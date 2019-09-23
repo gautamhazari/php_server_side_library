@@ -11,5 +11,5 @@
 	"client_name": "SDKTestApp",
 	"context":"demo",
 	"MaxDiscoveryCacheSize": 104857600,
-	"loginHintTokenPreference" : "True"
+	"loginHintTokenPreference" : "False"
 }
