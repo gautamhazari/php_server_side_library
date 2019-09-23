@@ -155,8 +155,13 @@ class AuthenticationService implements IAuthenticationService {
             $formData = array (
                 Parameters::AUTHENTICATION_REDIRECT_URI => $redirectUrl,
                 Parameters::CODE => $code,
-                Parameters::GRANT_TYPE => DefaultOptions::GRANT_TYPE
+                Parameters::GRANT_TYPE => DefaultOptions::GRANT_TYPE,
             );
+            if (!$isBasicAuth) {
+                $formData = array_merge($formData, array(
+                    Parameters::CLIENT_ID => $clientId,
+                    Parameters::CLIENT_SECRET => $clientSecret));
+            }
             $authentication = $isBasicAuth ? RestAuthentication::Basic($clientId, $clientSecret) : null;
             $response = $this->_client->post($requestTokenUrl, $authentication, $formData, null, null, null, null, null);
 
