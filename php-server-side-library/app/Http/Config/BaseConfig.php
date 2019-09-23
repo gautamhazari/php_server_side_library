@@ -105,11 +105,11 @@ abstract class BaseConfig
     }
 
     public function isXredirect() {
-        return $this->xRedirect;
+        return $this->xRedirect == "True";
     }
 
     public function isIncludeRequestIP() {
-        return $this->includeRequestIP;
+        return $this->includeRequestIP == "True";
     }
 
     public function isLoginHintTokenPreference () {

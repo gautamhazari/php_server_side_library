@@ -295,7 +295,7 @@ class AuthenticationService implements IAuthenticationService {
         $shouldUseAuthorize = $this->shouldUseAuthorize($options);
 
         if ($shouldUseAuthorize) {
-            $options->setPrompt("mobile");
+            $options->setPrompt(Parameters::NONE);
         }
 
         $authUrl = $this->StartAuthentication($clientId, $authorizeUrl, $redirectUrl, $state, $nonce, $encryptedMSISDN,
