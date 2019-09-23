@@ -33,7 +33,7 @@ class VersionDetection
             } else if(in_array(Version::MC_V1_2, $supportedVersions) && sizeof($supportedVersions) == 1 && VersionDetection::containsScopesV2_0($currentScopes)) {
                 return Version::MC_V1_2;
             } else {
-                throw new InvalidScopeException($scope);
+                throw new InvalidScopeException($scope, $version);
             }
         }
     }

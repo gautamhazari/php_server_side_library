@@ -11,10 +11,10 @@ namespace MCSDK\Exceptions;
 
 class InvalidScopeException extends \Exception
 {
-    const MESSAGE = "Failed to process the scope: '%s'. The scope doesn't support (scope isn't correct or doesn't match with version)";
+    const MESSAGE = "Failed to process the scope: '%s'. The scope doesn't support (scope isn't correct or doesn't match with version (%s))";
 
-    public function __construct($scope) {
-        $message = sprintf(self::MESSAGE, $scope);
+    public function __construct($scope, $version=null) {
+        $message = sprintf(self::MESSAGE, $scope, $version);
         parent::__construct($message);
     }
 }
