@@ -11,5 +11,5 @@
 	"tokenURL": "https://operator-b.sandbox.mobileconnect.io/oidc/accesstoken",
 	"userInfoURl": "https://operator-b.sandbox.mobileconnect.io/oidc/userinfo",
 	"premiumInfoURl": "https://operator-b.sandbox.mobileconnect.io/oidc/premiuminfo",
-	"metadataURl": ""
+	"metadataURl": "https://operator-b.sandbox.mobileconnect.io/.well-known/openid-configuration"
 }
