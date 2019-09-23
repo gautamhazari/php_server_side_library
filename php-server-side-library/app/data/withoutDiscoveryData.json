@@ -6,7 +6,7 @@
 	"apiVersion":"mc_di_v3.0",
 	"client_name":"SDKTestApp",
 	"context":"demo",
-	"binding_message":"demo auth",
+	"binding_message":"demo authz",
 	"authURL": "https://operator-b.sandbox.mobileconnect.io/oidc/authorize",
 	"tokenURL": "https://operator-b.sandbox.mobileconnect.io/oidc/accesstoken",
 	"userInfoURl": "https://operator-b.sandbox.mobileconnect.io/oidc/userinfo",

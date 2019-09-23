@@ -7,9 +7,9 @@
 	"redirectURL": "http://172.19.0.238/php-server-side-library/public/callback",
 	"xRedirect": "False",
 	"includeRequestIP": "True",
-	"scope":"openid mc_authn",
+	"scope":"openid mc_authz",
 	"client_name": "SDKTestApp",
 	"context":"demo",
 	"MaxDiscoveryCacheSize": 104857600,
-	"loginHintTokenPreference" : "False"
+	"loginHintTokenPreference" : "True"
 }
