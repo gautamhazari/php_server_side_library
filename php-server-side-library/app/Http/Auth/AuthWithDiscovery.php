@@ -22,11 +22,14 @@ class AuthWithDiscovery
 {
     public static function startAuth($mobileConnect, $response, $config) {
         $sdkSession = $response->getSDKSession();
-        $subscriberId = $response->getDiscoveryResponse()->getResponseData()[Parameters::SUBSCRIBER_ID];
+        $responseData = $response->getDiscoveryResponse()->getResponseData();
+        $subscriberId = null;
+        $subscriberIdToken = null;
+        isset($responseData[Parameters::SUBSCRIBER_ID]) ? $subscriberId = $responseData[Parameters::SUBSCRIBER_ID] : null;
         $options = McUtils::getMcOptions($config, $response->getDiscoveryResponse());
 
         $loginHintTokenPreference = $config->isLoginHintTokenPreference();
-        $subscriberIdToken = $response->getDiscoveryResponse()->getResponseData()[Parameters::SUBSCRIBER_ID_TOKEN];
+        isset($responseData[Parameters::SUBSCRIBER_ID_TOKEN]) ? $subscriberIdToken = $responseData[Parameters::SUBSCRIBER_ID_TOKEN] : null;
         try {
             if (VersionDetection::getCurrentVersion($config->getApiVersion(), $config->getScopes(),
                     $response->getDiscoveryResponse()->getProviderMetadata()) == DefaultOptions::VERSION_DI_3_0) {
