@@ -59,7 +59,7 @@ class Parameters
     const LOGIN_TOKEN_HINT="login_token_hint";
     const X_REDIRECT = "xRedirect";
     const INCLUDE_REQ_IP = "includeRequestIP";
-    const LOGIN_HINT_TOKEN_PREFERENCE = "loginHintTokenPreference ";
+    const LOGIN_HINT_TOKEN_PREFERENCE = "loginHintTokenPreference";
     const API_VERS = "apiVersion";
     const RESPONSE_MODE = "response_mode";
 
