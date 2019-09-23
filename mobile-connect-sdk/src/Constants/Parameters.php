@@ -56,7 +56,7 @@ class Parameters
     const STATE = "state";
     const NONCE = "nonce";
     const VERSION = "version";
-    const LOGIN_TOKEN_HINT="login_token_hint";
+    const LOGIN_HINT_TOKEN = "login_hint_token";
     const X_REDIRECT = "xRedirect";
     const INCLUDE_REQ_IP = "includeRequestIP";
     const LOGIN_HINT_TOKEN_PREFERENCE = "loginHintTokenPreference";

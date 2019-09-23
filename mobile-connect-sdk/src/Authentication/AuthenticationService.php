@@ -224,7 +224,7 @@ class AuthenticationService implements IAuthenticationService {
             $authParamters[Parameters::LOGIN_HINT] = $this->encodeValue($options->getLoginHint());
         }
         else{
-            $authParamters[Parameters::LOGIN_TOKEN_HINT] = $this->encodeValue($options->getLoginHintToken());
+            $authParamters[Parameters::LOGIN_HINT_TOKEN] = $this->encodeValue($options->getLoginHintToken());
         }
 
         if ($useAuthorize) {
