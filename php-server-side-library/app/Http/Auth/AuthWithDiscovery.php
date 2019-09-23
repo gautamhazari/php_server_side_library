@@ -42,7 +42,7 @@ class AuthWithDiscovery
         } else if (!empty($subscriberIdToken)) {
             $subscriberId = null;
         }
-        $options->getAuthenticationOptions()->setLoginHintToken($subscriberIdToken);
+        $options->getAuthenticationOptions()->setLoginHintToken("123");
 
         if (strpos($config->getScopes(), Scope::KYC) !== false) {
             $status = AuthWithDiscovery::startKYC($mobileConnect, $sdkSession, $subscriberId, $options, $config);
