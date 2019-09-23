@@ -113,7 +113,7 @@ abstract class BaseConfig
     }
 
     public function isLoginHintTokenPreference () {
-        return $this->loginHintTokenPreference;
+        return $this->loginHintTokenPreference == "True";
     }
 
     public function getApiVersion() {
