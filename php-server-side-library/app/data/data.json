@@ -8,6 +8,7 @@
 	"xRedirect": "False",
 	"includeRequestIP": "True",
 	"scope":"openid mc_authz",
+	"binding_message":"demo authz",
 	"client_name": "SDKTestApp",
 	"context":"demo",
 	"MaxDiscoveryCacheSize": 104857600,
